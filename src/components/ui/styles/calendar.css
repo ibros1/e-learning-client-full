@@ -1,0 +1,5 @@
+/* styles/calendar.css */
+.rdp {
+  --rdp-accent-color: hsl(217.2 91.2% 59.8%);
+  --rdp-background-color: hsl(222.2 84% 4.9%);
+}
