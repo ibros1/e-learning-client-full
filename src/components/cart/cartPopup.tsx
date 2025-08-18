@@ -5,7 +5,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import { Button } from "../ui/button";
 import type { RootState } from "../../store/store";
 import { removeFromCart } from "../../store/slices/cart/cart";
-import { BASE_API_URL } from "../../constants/base_url";
 
 const CartPopup = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
@@ -56,7 +55,7 @@ const CartPopup = () => {
                 >
                   {item.course_img && (
                     <img
-                      src={`${BASE_API_URL}/uploads/${item.course_img}`}
+                      src={`${item.course_img}`}
                       alt={item.title}
                       className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                     />

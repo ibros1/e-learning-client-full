@@ -252,7 +252,7 @@ export default function HomePage() {
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
+            <div className="xl:flex xs:flex-row  gap-3 sm:gap-4">
               <button
                 onClick={() => navigate("/signup")}
                 className="px-4 py-2.5 sm:px-6 sm:py-3 rounded-full bg-indigo-700 text-white font-medium shadow-md hover:bg-indigo-800 transition text-sm sm:text-base"
@@ -269,12 +269,12 @@ export default function HomePage() {
           </div>
 
           {/* Right Image */}
-          <div className="w-full lg:w-1/2 mt-6 sm:mt-8 lg:mt-0 flex justify-center">
+          <div className="w-full lg:w-[40%] mt-6 sm:mt-8 lg:mt-0 flex justify-center">
             <div className="w-full max-w-md lg:max-w-none">
               <img
                 src="/hero1.png"
                 alt="Learning illustration"
-                className="w-full h-auto rounded-lg max-w-full"
+                className="w-full h-auto rounded-lg "
                 loading="lazy"
               />
             </div>

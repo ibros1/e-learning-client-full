@@ -275,7 +275,9 @@ const Chapters = () => {
                   <option>----- Change Course -----</option>
                   {courses?.map((course) => (
                     <option key={course.id} value={course.id}>
-                      {course.title}
+                      {course.title.length > 50
+                        ? course.title.slice(0, 50) + "...."
+                        : course.title}
                     </option>
                   ))}
                 </select>
@@ -289,7 +291,11 @@ const Chapters = () => {
                   name="name"
                   required
                   placeholder="Enter Chapter Title"
-                  value={chapterTitle}
+                  value={
+                    chapterTitle.length > 35
+                      ? chapterTitle.slice(0, 35) + "..."
+                      : chapterTitle
+                  }
                   onChange={(e) => setChapterTitle(e.target.value)}
                 />
               </div>

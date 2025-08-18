@@ -7,6 +7,7 @@ import type { RootState } from "../../store/store";
 import Profile from "../Profile/profilePopup";
 import MobileSidebar from "../sidebar/mobile.sidebar";
 import CartPopup from "../cart/cartPopup";
+import Search from "../search";
 
 const Header = () => {
   const logInState = useSelector((state: RootState) => state.loginSlice);
@@ -16,7 +17,7 @@ const Header = () => {
 
   const path = location.pathname.replace(/\/+$/, "");
   const isMyCoursesPage = path.startsWith("/my-courses");
-
+  const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   // normalize trailing slash
   return (
     <>
@@ -77,6 +78,7 @@ const Header = () => {
               aria-label="Search"
               className="bb-icon-search bb-icon-l p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
               type="button"
+              onClick={() => setIsSearchPopupOpen(!isSearchPopupOpen)}
             />
             <CartPopup />
             <button
@@ -137,6 +139,9 @@ const Header = () => {
       >
         <MobileSidebar onClose={() => setSidebarOpen(false)} />
       </aside>
+      {isSearchPopupOpen && (
+        <Search onClose={() => setIsSearchPopupOpen(false)} />
+      )}
     </>
   );
 };
