@@ -1,1 +1,1 @@
-export const BASE_API_URL = "http://localhost:5000";
+export const BASE_API_URL = "https://e-learning-api-one.vercel.app";

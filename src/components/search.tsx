@@ -85,7 +85,7 @@ const Search = ({ onClose }: SearchProps) => {
       try {
         // Map courses to search results
         const courseResults: SearchResult[] = courses.map((course) => ({
-          id: course.id,
+          id: course.id.toString(),
           type: "course",
           name: course.title,
           imageUrl: course.course_img,
@@ -93,7 +93,7 @@ const Search = ({ onClose }: SearchProps) => {
 
         // Map users to search results
         const userResults: SearchResult[] = users.map((user) => ({
-          id: user.id,
+          id: user.id.toString(),
           type: "member",
           name: user.full_name || user.username || "Unknown User",
           imageUrl: user.profilePhoto,
