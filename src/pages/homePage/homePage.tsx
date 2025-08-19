@@ -82,51 +82,10 @@ export default function HomePage() {
   }, [courses, search, levelFilter, priceFilter, categoryFilter]);
 
   // Stats counters
-  const [studentsCount, setStudentsCount] = useState<number>(0);
-  const [coursesCount, setCoursesCount] = useState<number>(0);
-  const [instructorsCount, setInstructorsCount] = useState<number>(0);
-  const [completionRate, setCompletionRate] = useState<number>(0);
-
-  useEffect(() => {
-    const targetStudents = Math.max(
-      1200,
-      courses.reduce((acc: number, c) => acc + (c.enrollments?.length || 0), 0)
-    );
-    const targetCourses = Math.max(12, courses.length || 12);
-    const targetInstructors = 24;
-    const targetCompletion = 85;
-
-    let s = 0,
-      c = 0,
-      i = 0,
-      comp = 0;
-    const dur = 900;
-    const steps = 60;
-    const si = Math.ceil((targetStudents - s) / steps);
-    const ci = Math.ceil((targetCourses - c) / steps);
-    const ii = Math.ceil((targetInstructors - i) / steps);
-    const compi = Math.ceil((targetCompletion - comp) / steps);
-
-    const interval = setInterval(() => {
-      s = Math.min(targetStudents, s + si);
-      c = Math.min(targetCourses, c + ci);
-      i = Math.min(targetInstructors, i + ii);
-      comp = Math.min(targetCompletion, comp + compi);
-      setStudentsCount(s);
-      setCoursesCount(c);
-      setInstructorsCount(i);
-      setCompletionRate(comp);
-      if (
-        s === targetStudents &&
-        c === targetCourses &&
-        i === targetInstructors &&
-        comp === targetCompletion
-      ) {
-        clearInterval(interval);
-      }
-    }, Math.max(10, Math.floor(dur / steps)));
-    return () => clearInterval(interval);
-  }, [courses]);
+  const studentsCount = "600";
+  const coursesCount = "12";
+  const instructorsCount = "600";
+  const completionRate = "43";
 
   // Categories from courses
   const categories = useMemo(() => {
@@ -143,8 +102,6 @@ export default function HomePage() {
     courseId: course.id,
     lessonsCount: course.lesson?.length || 18,
   }));
-
-  const fmt = (n: number) => n.toLocaleString();
 
   return (
     <div className="w-screen xl:w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0B1228] dark:via-[#091025] dark:to-[#050819] dark:text-gray-100 overflow-x-hidden">
@@ -365,7 +322,7 @@ export default function HomePage() {
                   Students
                 </p>
                 <p className="text-2xl md:text-3xl font-bold">
-                  {fmt(studentsCount)}+
+                  {studentsCount}+
                 </p>
               </div>
             </div>
@@ -386,7 +343,7 @@ export default function HomePage() {
                   Courses
                 </p>
                 <p className="text-2xl md:text-3xl font-bold">
-                  {fmt(coursesCount)}+
+                  {coursesCount}+
                 </p>
               </div>
             </div>
@@ -407,7 +364,7 @@ export default function HomePage() {
                   Instructors
                 </p>
                 <p className="text-2xl md:text-3xl font-bold">
-                  {fmt(instructorsCount)}+
+                  {instructorsCount}+
                 </p>
               </div>
             </div>
