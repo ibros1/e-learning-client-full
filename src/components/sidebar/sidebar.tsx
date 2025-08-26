@@ -6,8 +6,9 @@ import { FaCheckCircle } from "react-icons/fa";
 import logo from "../../../public/logo.png";
 
 const Sidebar = () => {
-  const userLogin = useSelector((state: RootState) => state.WhoAmiSlice);
+  const userLogin = useSelector((state: RootState) => state.loginSlice);
   const user = userLogin.data?.user;
+
   const fullName = user?.full_name || "Guest User";
   const username = user?.username || "guest";
   const profilePhoto = user?.profilePhoto ? `${user.profilePhoto}` : "";

@@ -52,6 +52,7 @@ import {
 import CreateCourseDialog from "../components/courses/CreateCourseDailog";
 import type { Course } from "../../types/course";
 import Spinner from "../../components/spinner";
+import AdminCoursesSkeleton from "../../components/ui/AdminCoursesSkeleton";
 
 const AdminCourses = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -241,11 +242,7 @@ const AdminCourses = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spinner className="w-12 h-12 text-blue-600" />
-      </div>
-    );
+    return <AdminCoursesSkeleton />;
   }
 
   return (

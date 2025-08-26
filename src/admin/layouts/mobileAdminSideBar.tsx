@@ -1,12 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { type RootState } from "../../../store/store";
+import { type RootState } from "../../store/store";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../../components/ui/avatar";
-import logo from "../../../../public/logo.png";
+} from "../../components/ui/avatar";
+import logo from "../../../public/logo.png";
 
 import { FaCheckCircle } from "react-icons/fa";
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const MobileAdminSideBar = ({ onClose }: Props) => {
-  const loginState = useSelector((state: RootState) => state.WhoAmiSlice);
+  const loginState = useSelector((state: RootState) => state.loginSlice);
   const user = loginState.data?.user;
   const fullName = user?.full_name || "Guest User";
   const username = user?.username || "guest";

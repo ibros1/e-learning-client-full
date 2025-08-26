@@ -10,7 +10,7 @@ interface Props {
 }
 
 const MobileSidebar = ({ onClose }: Props) => {
-  const userState = useSelector((state: RootState) => state.WhoAmiSlice);
+  const userState = useSelector((state: RootState) => state.loginSlice);
   const user = userState.data?.user;
   const fullName = user?.full_name || "Guest User";
   const username = user?.username || "guest";

@@ -632,8 +632,13 @@ const ContinueCourse = () => {
           {/* Video Player Container */}
           <div className="mb-10 rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800">
             <div className="relative aspect-video">
-              <Plyr source={source} />
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+              {currentLesson?.video_url ? (
+                <Plyr className="auto-play" source={source} />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-gray-900 text-white text-lg font-semibold">
+                  📂 No video available for this lesson
+                </div>
+              )}
             </div>
           </div>
 

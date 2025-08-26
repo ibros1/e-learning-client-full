@@ -1,12 +1,12 @@
 import { Outlet, useLocation, useNavigate } from "react-router";
 
-import AdminHeader from "../../../components/header/adminHeader";
+import AdminHeader from "../../components/header/adminHeader";
 import ResponsiveAdminSidebar from "./adminSideBar";
 // import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
-import { Button } from "../../../components/ui/button";
-import Footer from "../../../components/footer/footer";
+import type { RootState } from "../../store/store";
+import { Button } from "../../components/ui/button";
+import Footer from "../../components/footer/footer";
 import { useEffect } from "react";
 
 const AdminDashboard = () => {

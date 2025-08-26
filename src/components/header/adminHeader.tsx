@@ -6,7 +6,7 @@ import type { RootState } from "../../store/store";
 import { ChangeToggle } from "../darkMode";
 
 import Profile from "../Profile/AdminProfilePopup";
-import MobileAdminSideBar from "../../pages/dashboard/layouts/mobileAdminSideBar";
+import MobileAdminSideBar from "../../admin/layouts/mobileAdminSideBar";
 
 const AdminHeader = () => {
   const logInState = useSelector((state: RootState) => state.loginSlice);

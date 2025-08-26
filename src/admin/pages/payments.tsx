@@ -28,6 +28,7 @@ import type { AppDispatch, RootState } from "../../store/store";
 import clsx from "clsx";
 import type { Payment } from "../../types/payment";
 import { motion } from "framer-motion";
+import { PaymentsSkeleton } from "../../components/ui/paymentsSkeleton";
 
 export const Payments = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -216,6 +217,9 @@ export const Payments = () => {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+  if (paymentsState.loading) {
+    return <PaymentsSkeleton />;
+  }
 
   return (
     <div className="p-6 dark:bg-[#091025] min-h-screen w-full">

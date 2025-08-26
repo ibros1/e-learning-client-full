@@ -49,6 +49,9 @@ import {
   deleteLessonFn,
   resetDeleteLessonState,
 } from "../../store/slices/lessons/deleteLesson";
+import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
+
+import Spinner from "../../components/spinner";
 
 const Lessons = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -164,6 +167,12 @@ const Lessons = () => {
       dispatch(listLessonsFn());
     }
   }, [deleteState, dispatch]);
+  const lessonsList = useSelector((state: RootState) => state.listLessonSlice);
+
+  if (lessonsList.loading) {
+    return <LessonsSkeleton />;
+  }
+
   return (
     <div className="p-6 min-h-screen bg-white dark:bg-[#0b1120] text-foreground space-y-8">
       {/* Header */}
@@ -220,7 +229,6 @@ const Lessons = () => {
         <table className="min-w-full text-sm text-left">
           <thead className="bg-muted/50">
             <tr className="text-sm font-semibold text-muted-foreground uppercase">
-              <th className="px-4 py-3 whitespace-nowrap">#</th>
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Content</th>
               <th className="px-4 py-3">Chapter</th>
@@ -235,9 +243,6 @@ const Lessons = () => {
           <tbody className="divide-y divide-border">
             {lessons?.map((lesson) => (
               <tr key={lesson.id} className="hover:bg-muted transition-colors">
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                  {lesson.id}
-                </td>
                 <td className="px-4 py-3 max-w-[180px] truncate">
                   {lesson.title}
                 </td>
@@ -423,10 +428,11 @@ const Lessons = () => {
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
               <Button
+                disabled={updateState.loading}
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
+                className="bg-blue-600 disabled:bg-gray-500 disabled:hover:bg-gray-600 disabled:cursor-not-allowed hover:bg-blue-700 text-white px-6 py-2 rounded-full"
               >
-                Save changes
+                {updateState.loading ? <Spinner /> : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

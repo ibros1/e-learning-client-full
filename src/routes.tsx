@@ -7,8 +7,8 @@ import Settings from "./pages/dashboard/settings";
 
 import Register from "./pages/auth/register";
 import MyProfile from "./components/Profile/myProfile";
-import AdminDashboard from "./pages/dashboard/layouts/adminDashboard";
-import MainDashboard from "./pages/dashboard/layouts/main";
+import AdminDashboard from "./admin/layouts/adminDashboard";
+import MainDashboard from "./admin/layouts/main";
 import NotFound from "./pages/notFound";
 import AdminCourses from "./admin/pages/courses";
 import Lessons from "./admin/pages/lessons";

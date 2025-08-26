@@ -16,6 +16,7 @@ import {
 import EditEnrolls from "../components/enrolls/EditEnrolls";
 
 import DeleteEnrolls from "../components/enrolls/deleteEnrolls";
+import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
 
 type StatusType = "ALL" | "COMPLETED" | "IN_PROGRESS" | "FAILED";
 
@@ -87,6 +88,14 @@ const Enrollments = () => {
       color: "red",
     },
   ];
+
+  const enrollementsList = useSelector(
+    (state: RootState) => state.listEnrollementsSlice
+  );
+
+  if (enrollementsList.loading) {
+    return <LessonsSkeleton />;
+  }
 
   return (
     <div className="p-6 dark:bg-[#091025] min-h-screen text-gray-900 dark:text-white">

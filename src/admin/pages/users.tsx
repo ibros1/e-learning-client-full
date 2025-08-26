@@ -49,6 +49,7 @@ import {
 import { AlertDialog } from "@radix-ui/react-alert-dialog";
 import { updateUserInLogin } from "../../store/slices/auth/login";
 import Spinner from "../../components/spinner";
+import UsersAdminsSkeleton from "../../components/ui/userSkeleton";
 
 const UsersAdmins = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -192,6 +193,10 @@ const UsersAdmins = () => {
       dispatch(resetDeleteUserState());
     }
   }, [deleteState, dispatch]);
+
+  if (userState.loading) {
+    return <UsersAdminsSkeleton />;
+  }
 
   return (
     <div className="p-6 dark:bg-[#091025] min-h-screen transition-colors duration-300">

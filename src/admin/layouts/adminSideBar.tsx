@@ -1,16 +1,16 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { type RootState } from "../../../store/store";
+import { type RootState } from "../../store/store";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../../components/ui/avatar";
+} from "../../components/ui/avatar";
 import { FaCheckCircle } from "react-icons/fa";
-import logo from "../../../../public/logo.png";
+import logo from "../../../public/logo.png";
 
 const Sidebar = () => {
-  const user = useSelector((state: RootState) => state.WhoAmiSlice.data?.user);
+  const user = useSelector((state: RootState) => state.loginSlice.data?.user);
   const fullName = user?.full_name || "Guest User";
   const username = user?.username || "guest";
   const profilePhoto = user?.profilePhoto ? `${user.profilePhoto}` : "";

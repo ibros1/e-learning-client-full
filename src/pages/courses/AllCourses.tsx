@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import CourseCard from "./CourseCard";
+import CourseCardSkeleton from "../skeletons/courseSkeleton"; // 👈 import skeleton
 import type { AppDispatch, RootState } from "../../store/store";
 import { useEffect, useState } from "react";
 import { listCoursesFn } from "../../store/slices/courses/listCourse";
 
 const CoursesPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data } = useSelector((state: RootState) => state.listCoursesSlice);
+  const { data, loading } = useSelector(
+    (state: RootState) => state.listCoursesSlice
+  ); // 👈 include loading
   const courses = data?.courses || [];
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +46,7 @@ const CoursesPage = () => {
 
           <div className="flex flex-wrap justify-between gap-3 pt-8 pb-4">
             <div className="">
-              <h1 className="  text-gray-600 dark:text-gray-400">
+              <h1 className="text-gray-600 dark:text-gray-400">
                 {filteredCourses.length} Courses
               </h1>
             </div>
@@ -71,9 +74,13 @@ const CoursesPage = () => {
 
         {/* Course Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4  gap-6">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course}></CourseCard>
-          ))}
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <CourseCardSkeleton key={i} />
+              ))
+            : filteredCourses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
         </div>
       </div>
     </div>

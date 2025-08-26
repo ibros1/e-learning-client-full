@@ -5,6 +5,7 @@ import type { RootState } from "../../../store/store";
 import ForbiddenPage from "./ForbiddenPage";
 import type { AppDispatch } from "../../../store/store"; // fix import path for your AppDispatch
 import { WhoAmiFn } from "../../../store/slices/auth/user/getMe";
+import AdminLoader from "../adminLoader";
 
 export default function ProtectedAdminRoute({
   children,
@@ -21,7 +22,7 @@ export default function ProtectedAdminRoute({
     dispatch(WhoAmiFn());
   }, [dispatch]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <AdminLoader />;
 
   if (allowedRoles.includes(whoAmi.user?.role || "")) {
     return children;

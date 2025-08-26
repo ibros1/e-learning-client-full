@@ -35,29 +35,29 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../../components/ui/card";
-import { Calendar } from "../../../components/ui/calendar";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
+} from "../../components/ui/card";
+import { Calendar } from "../../components/ui/calendar";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../../components/ui/avatar";
-import { Progress } from "../../../components/ui/progress";
+} from "../../components/ui/avatar";
+import { Progress } from "../../components/ui/progress";
 import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
-} from "../../../components/ui/drawer";
+} from "../../components/ui/drawer";
 
 // Store
-import type { AppDispatch, RootState } from "../../../store/store";
-import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnrollements";
-import { listUsersFn } from "../../../store/slices/auth/user/getAllUsers";
-import { listCoursesFn } from "../../../store/slices/courses/listCourse";
-import { listLessonsFn } from "../../../store/slices/lessons/listLessons";
-import { listChaptersFn } from "../../../store/slices/chapters/listChapters";
+import type { AppDispatch, RootState } from "../../store/store";
+import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
+import { listUsersFn } from "../../store/slices/auth/user/getAllUsers";
+import { listCoursesFn } from "../../store/slices/courses/listCourse";
+import { listLessonsFn } from "../../store/slices/lessons/listLessons";
+import { listChaptersFn } from "../../store/slices/chapters/listChapters";
 
 // Data
 const COLORS = ["#6366f1", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
