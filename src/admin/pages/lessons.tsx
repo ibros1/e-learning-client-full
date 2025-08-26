@@ -238,7 +238,6 @@ const Lessons = () => {
   }, [selectedLesson?.video_url]);
 
   const openVideoModal = (lesson: Lesson) => {
-    setSelectedLesson(lesson.video_url);
     setSelectedLesson(lesson);
     setIsVideoModalOpen(true);
   };
