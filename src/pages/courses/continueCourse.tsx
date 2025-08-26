@@ -26,6 +26,7 @@ import type { SourceInfo } from "plyr";
 import { getLessonProgressFn } from "../../store/lessonProggress/getLessonProggress";
 import { createLessonProgressFn } from "../../store/lessonProggress/makeProgress";
 import { getCompletedLessonsFn } from "../../store/lessonProggress/getCompletedProggress";
+import ContinueCourseSkeleton from "../../components/ui/continueCourseSkeleton";
 
 const getYouTubeId = (url: string) => {
   try {
@@ -279,7 +280,13 @@ const ContinueCourse = () => {
   const nextLesson = sortedLessons[currentIndex + 1];
 
   // Early returns
-  if (loading) return <div className="p-12 text-center">Loading course...</div>;
+  if (loading || userState.loading)
+    return (
+      <div className="p-12 text-center">
+        {" "}
+        <ContinueCourseSkeleton />{" "}
+      </div>
+    );
   if (!course)
     return (
       <div className="p-12 text-center text-red-500">
