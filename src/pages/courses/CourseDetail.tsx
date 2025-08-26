@@ -22,6 +22,7 @@ import {
 
 import EnrolleCourseDetail from "./enrollCourseDetail";
 import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
+import CourseDetailPageSkeleton from "../../components/ui/courseDetail";
 
 const CourseDetailPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -53,16 +54,9 @@ const CourseDetailPage = () => {
     if (courseId) dispatch(getOneCourseFn(+courseId));
   }, [dispatch, courseId]);
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#091025]">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-16 w-16 rounded-full bg-blue-100 mb-6 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-48 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <CourseDetailPageSkeleton />;
+  }
 
   if (!course)
     return (

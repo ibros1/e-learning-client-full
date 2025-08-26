@@ -1,17 +1,24 @@
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { Pencil, Search, Trash2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Pencil,
+  Trash2,
+  Search,
+  BookOpen,
+  GraduationCap,
+  BookCopy,
+  Clock,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Button } from "../../components/ui/button";
-import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
 import {
@@ -24,9 +31,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import { Checkbox } from "../../components/ui/checkbox";
 
-import ChaptersSkeleton from "../../components/ui/ChaptersSkeleton";
 import CreateChapters from "../components/chapters/createChapters";
+import ChaptersSkeleton from "../../components/ui/ChaptersSkeleton";
 
 import type { AppDispatch, RootState } from "../../store/store";
 import { listChaptersFn } from "../../store/slices/chapters/listChapters";
@@ -39,6 +55,7 @@ import {
   deleteChapterFn,
   resetDeleteChapterState,
 } from "../../store/slices/chapters/deleteChapter";
+import Spinner from "../../components/spinner";
 
 const Chapters = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -46,16 +63,17 @@ const Chapters = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  // --- Edit State
+  // Edit State
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedChapterId, setSelectedChapterId] = useState<string>("");
   const [courseId, setCourseId] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
 
-  // --- Delete State
+  // Delete State
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // --- Redux State
+  // Redux State
   const coursesState = useSelector(
     (state: RootState) => state.listCoursesSlice
   );
@@ -79,7 +97,7 @@ const Chapters = () => {
     (state: RootState) => state.deleteChapterSlice
   );
 
-  // --- Initial Fetch
+  // Initial Fetch
   useEffect(() => {
     if (!didFetch.current) {
       dispatch(listChaptersFn());
@@ -88,7 +106,7 @@ const Chapters = () => {
     }
   }, [dispatch]);
 
-  // --- Handle Update State
+  // Update State Handler
   useEffect(() => {
     if (updateChapterState.error) {
       toast.error(updateChapterState.error);
@@ -103,7 +121,7 @@ const Chapters = () => {
     }
   }, [updateChapterState, dispatch]);
 
-  // --- Handle Delete State
+  // Delete State Handler
   useEffect(() => {
     if (deleteChapterState.error) {
       toast.error(deleteChapterState.error);
@@ -111,14 +129,15 @@ const Chapters = () => {
     }
 
     if (deleteChapterState.data?.isSuccess) {
-      toast.success("Chapter deleted successfully!");
+      toast.success("Chapter(s) deleted successfully!");
       dispatch(listChaptersFn());
       dispatch(resetDeleteChapterState());
       setIsDeleteDialogOpen(false);
+      setSelectedIds([]);
     }
   }, [deleteChapterState, dispatch]);
 
-  // --- Submit Edit
+  // Edit Submit
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(
@@ -130,14 +149,22 @@ const Chapters = () => {
     );
   };
 
-  // --- Submit Delete
+  // Delete Submit
   const handleDelete = () => {
-    if (selectedChapterId) {
-      dispatch(deleteChapterFn(selectedChapterId));
+    if (selectedIds.length > 0) {
+      selectedIds.forEach((id) => dispatch(deleteChapterFn(id)));
     }
   };
 
-  // --- Loading State
+  // Select All Handler
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(chapters.map((c) => c.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
   if (listChaptersState.loading) {
     return <ChaptersSkeleton />;
   }
@@ -153,33 +180,97 @@ const Chapters = () => {
           <CreateChapters />
         </div>
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+          <div className="rounded-xl border bg-card dark:bg-[#0f1629] p-4 shadow-sm flex items-center gap-3">
+            <BookOpen className="w-6 h-6 text-primary" />
+            <div>
+              <p className="text-sm text-muted-foreground">Total Chapters</p>
+              <p className="text-xl font-semibold">{chapters.length}</p>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-card dark:bg-[#0f1629] p-4 shadow-sm flex items-center gap-3">
+            <GraduationCap className="w-6 h-6 text-primary" />
+            <div>
+              <p className="text-sm text-muted-foreground">Total Courses</p>
+              <p className="text-xl font-semibold">{courses.length}</p>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-card dark:bg-[#0f1629] p-4 shadow-sm flex items-center gap-3">
+            <BookCopy className="w-6 h-6 text-primary" />
+            <div>
+              <p className="text-sm text-muted-foreground">Total Lessons</p>
+              <p className="text-xl font-semibold">
+                {chapters.reduce((acc, c) => acc + c.lesson.length, 0)}
+              </p>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-card dark:bg-[#0f1629] p-4 shadow-sm flex items-center gap-3">
+            <Clock className="w-6 h-6 text-primary" />
+            <div>
+              <p className="text-sm text-muted-foreground">Recently Added</p>
+              <p className="text-xl font-semibold">
+                {chapters[0]?.chapterTitle ?? "-"}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Search */}
-        <div className="relative max-w-md">
+        <div className="relative max-w-md mt-6">
           <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-          <input
+          <Input
             type="text"
             placeholder="Search chapters…"
-            className="w-full rounded-xl px-10 py-3 border border-input bg-card text-sm focus:ring-2 focus:ring-primary outline-none"
+            className="w-full rounded-xl pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border border-border rounded-xl shadow-sm">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-muted/50">
-            <tr className="text-sm font-semibold text-muted-foreground uppercase">
-              <th className="px-4 py-3">Chapter Title</th>
-              <th className="px-4 py-3">Course ID</th>
-              <th className="px-4 py-3">Course Title</th>
-              <th className="px-4 py-3">Lessons</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+      {/* Bulk Delete Button */}
+      <div className="mb-4">
+        {selectedIds.length === 0 ? (
+          <Button
+            className="opacity-[0.5]"
+            disabled
+            variant="destructive"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Delete Selected (
+            {selectedIds.length})
+          </Button>
+        ) : (
+          <Button
+            variant="destructive"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Delete Selected (
+            {selectedIds.length})
+          </Button>
+        )}
+      </div>
+
+      {/* Data Table */}
+      <div className="overflow-x-auto border rounded-xl shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedIds.length === chapters.length}
+                  onCheckedChange={(val) => toggleSelectAll(!!val)}
+                />
+              </TableHead>
+              <TableHead>Chapter Title</TableHead>
+              <TableHead>Course</TableHead>
+              <TableHead>Lessons</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {chapters
               .filter(
                 (c) =>
@@ -192,26 +283,32 @@ const Chapters = () => {
                     .includes(searchTerm.toLowerCase())
               )
               .map((chapter) => (
-                <tr
-                  key={chapter.id}
-                  className="hover:bg-muted transition-colors"
-                >
-                  <td className="px-4 py-3 max-w-[180px] truncate">
+                <TableRow key={chapter.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.includes(chapter.id)}
+                      onCheckedChange={(val) =>
+                        setSelectedIds((prev) =>
+                          val
+                            ? [...prev, chapter.id]
+                            : prev.filter((id) => id !== chapter.id)
+                        )
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate">
                     {chapter.chapterTitle}
-                  </td>
-                  <td className="px-4 py-3">{chapter.courseId}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {chapter.courses?.title}
-                  </td>
-                  <td className="px-4 py-3">{chapter.lesson.length} lessons</td>
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                  </TableCell>
+                  <TableCell>{chapter.courses?.title}</TableCell>
+                  <TableCell>{chapter.lesson.length} lessons</TableCell>
+                  <TableCell className="text-muted-foreground whitespace-nowrap">
                     {new Date(chapter.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "2-digit",
                     })}
-                  </td>
-                  <td className="px-4 py-3 text-center space-x-2">
+                  </TableCell>
+                  <TableCell className="text-center space-x-2">
                     <Button
                       size="sm"
                       variant="outline"
@@ -229,16 +326,15 @@ const Chapters = () => {
                       variant="destructive"
                       onClick={() => {
                         setIsDeleteDialogOpen(true);
-                        setSelectedChapterId(chapter.id);
+                        setSelectedIds([chapter.id]);
                       }}
                     >
                       <Trash2 className="w-4 h-4 mr-1" /> Delete
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
 
-            {/* Empty State */}
             {chapters.filter(
               (c) =>
                 c.chapterTitle
@@ -249,95 +345,98 @@ const Chapters = () => {
                   ?.toLowerCase()
                   .includes(searchTerm.toLowerCase())
             ).length === 0 && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="text-center py-6 text-muted-foreground"
-                >
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-6">
                   No chapters match your search.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <form onSubmit={handleEditSubmit} className="sm:max-w-[425px]">
+        <DialogContent className="rounded-xl dark:bg-[#091025]">
+          <DialogHeader>
             <DialogTitle>Edit Chapter</DialogTitle>
             <DialogDescription>
-              You can edit the selected chapter below.
+              Update the details of the selected chapter.
             </DialogDescription>
+          </DialogHeader>
 
-            <div className="grid gap-4 py-2">
-              <div className="grid gap-3">
-                <Label htmlFor="course">Select Course</Label>
-                <select
-                  className="border-2 p-2 rounded-md"
-                  value={courseId}
-                  onChange={(e) => setCourseId(e.target.value)}
-                >
-                  <option value="">-- Change Course --</option>
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title.length > 50
-                        ? course.title.slice(0, 50) + "..."
-                        : course.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Select Course
+              </label>
+              <select
+                className="w-full border rounded-lg p-2 bg-white dark:bg-[#0f1629]"
+                value={courseId}
+                onChange={(e) => setCourseId(e.target.value)}
+              >
+                <option value="">-- Change Course --</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title.length > 50
+                      ? course.title.slice(0, 50) + "..."
+                      : course.title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="grid gap-3">
-                <Label htmlFor="chapterName">Chapter Name</Label>
-                <Input
-                  type="text"
-                  id="chapterName"
-                  required
-                  placeholder="Enter Chapter Title"
-                  value={chapterTitle}
-                  onChange={(e) => setChapterTitle(e.target.value)}
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Chapter Name
+              </label>
+              <Input
+                type="text"
+                required
+                placeholder="Enter Chapter Title"
+                value={chapterTitle}
+                onChange={(e) => setChapterTitle(e.target.value)}
+              />
             </div>
 
             <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit">Save changes</Button>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-slate-900 hover:bg-slate-800 disabled:bg-gray-500 disabled:hover:bg-gray-600"
+                disabled={updateChapterState.loading}
+              >
+                {updateChapterState.loading ? <Spinner /> : "Update"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation */}
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent className="rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <AlertDialogContent className="rounded-xl dark:bg-[#091025]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Delete Chapter
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-gray-600 dark:text-gray-400">
-              Are you sure you want to delete this chapter? This action cannot
-              be undone and will also remove all lessons inside it.
+            <AlertDialogTitle>Delete Chapter(s)</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the selected chapter(s)? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-
-          <AlertDialogFooter className="mt-6 flex gap-3 sm:justify-end">
-            <AlertDialogCancel className="rounded-lg px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-              Cancel
-            </AlertDialogCancel>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 text-white hover:bg-red-700"
             >
               Delete
             </AlertDialogAction>

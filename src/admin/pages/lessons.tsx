@@ -401,28 +401,27 @@ const Lessons = () => {
       </div>
 
       {/* Video Modal */}
+      {/* Video Modal */}
       <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
-        <DialogContent className="w-full max-w-4xl h-full max-h-[90vh] p-0 rounded-xl bg-black text-white border-0 overflow-y-auto">
+        <DialogContent className="w-full max-w-7xl max-h-[90vh] p-0 rounded-xl bg-black text-white border-0 overflow-hidden flex flex-col">
           {/* Video Container */}
-          <div className="absolute px-3 w-full aspect-video">
+          <div className="w-full aspect-video">
             <Plyr source={source} />
           </div>
 
           {/* Lesson Details */}
-          <div className=" mt-[250px] sm:mt-[450px] md:mt-[500px] lg:mt-[500px] p-4 md:p-6 z-50  space-y-4">
+          <div className="p-4 md:p-6  overflow-y-auto flex-1 space-y-4 bg-black text-white">
             {/* Title + Badge */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <h2 className="text-lg md:text-2xl font-bold">
                 {selectedLesson?.title}
               </h2>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="bg-red-600 text-white border-0 text-xs md:text-sm"
-                >
-                  HD
-                </Badge>
-              </div>
+              <Badge
+                variant="outline"
+                className="bg-red-600 text-white border-0 text-xs md:text-sm"
+              >
+                HD
+              </Badge>
             </div>
 
             {/* Meta Info */}
@@ -431,7 +430,6 @@ const Lessons = () => {
                 <Clock className="h-4 w-4" />
                 <span>45 min</span>
               </div>
-
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 <span>
@@ -440,7 +438,6 @@ const Lessons = () => {
                     : "N/A"}
                 </span>
               </div>
-
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span>4.8 (120 reviews)</span>
