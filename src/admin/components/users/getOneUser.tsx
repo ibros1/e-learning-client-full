@@ -113,7 +113,7 @@ const GetOneUser = () => {
 
       {/* User Info */}
       <section>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mx-6">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mx-0 xl:mx-6">
           <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-6">
             User Information
           </h2>

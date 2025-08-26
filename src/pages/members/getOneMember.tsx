@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 import { getOneUserFn } from "../../store/slices/auth/user/getOneUser";
+import MyProfileSkeleton from "../../components/ui/myProfileSkeleton";
 
 const GetOneMemberPage = () => {
   const { userId } = useParams();
@@ -36,6 +37,10 @@ const GetOneMemberPage = () => {
   const profileImageUrl = user?.profilePhoto ? `${user?.profilePhoto}` : "";
 
   const coverImageUrl = user?.coverPhoto ? `${user?.coverPhoto}` : defaultCover;
+
+  if (userState.loading) {
+    return <MyProfileSkeleton />;
+  }
 
   return !user ? (
     <div className="">No user found!</div>

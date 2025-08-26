@@ -93,7 +93,7 @@ const CreateLessonDailog = () => {
     <div className="text-red-600 font-4xl">Please login first</div>
   ) : (
     <div>
-      <div className=" gap-4 lg:flex">
+      <div className=" flex flex-col gap-4  lg:flex">
         <CreateChapters />
         <Button
           className="bg-black font-bold hover:bg-slate-800"

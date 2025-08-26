@@ -21,6 +21,7 @@ import {
 } from "../../../store/slices/chapters/createChapter";
 import toast from "react-hot-toast";
 import { listChaptersFn } from "../../../store/slices/chapters/listChapters";
+import Spinner from "../../../components/spinner";
 
 // Dummy course data (bedel markaas later API call kaaga)
 
@@ -146,7 +147,13 @@ const CreateChapters = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Save changes</Button>
+              <Button
+                type="submit"
+                disabled={createChapterState.loading}
+                className="disabled:bg-gray-700 bg-slate-900 hover:bg-slate-700 disabled:hover:bg-gray-700 disabled:cursor-not-allowed"
+              >
+                {createChapterState.loading ? <Spinner /> : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

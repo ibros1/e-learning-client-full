@@ -104,11 +104,13 @@ const ContinueCourse = () => {
     );
   }, [sortedLessons, currentLessonId]);
 
+  // Get YouTube ID and video type
+  const youtubeId = useMemo(() => {
+    return getYouTubeId(currentLesson?.video_url || "");
+  }, [currentLesson?.video_url]);
+
   // Plyr source configuration
   const source: SourceInfo = useMemo(() => {
-    const url = currentLesson?.video_url || "";
-    const youtubeId = getYouTubeId(url);
-
     if (youtubeId) {
       return {
         type: "video",
@@ -131,13 +133,13 @@ const ContinueCourse = () => {
         type: "video",
         sources: [
           {
-            src: formatVideoUrl(url),
+            src: formatVideoUrl(currentLesson?.video_url || ""),
             type: "video/mp4",
           },
         ],
       };
     }
-  }, [currentLesson?.video_url]);
+  }, [currentLesson?.video_url, youtubeId]);
 
   // Group chapters
   const chaptersWithLessons = useMemo(() => {
@@ -316,11 +318,6 @@ const ContinueCourse = () => {
       </div>
     );
   }
-
-  // type lesson = {
-  //     video_url : string,
-  //     file_url
-  // }
 
   // Get appropriate icon for lesson type
   const getLessonIcon = (lesson: any) => {
@@ -633,7 +630,11 @@ const ContinueCourse = () => {
           <div className="mb-10 rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800">
             <div className="relative aspect-video">
               {currentLesson?.video_url ? (
-                <Plyr className="auto-play" source={source} />
+                youtubeId ? (
+                  <Plyr source={source} />
+                ) : (
+                  <Plyr source={source} />
+                )
               ) : (
                 <div className="flex items-center justify-center h-full bg-gray-900 text-white text-lg font-semibold">
                   📂 No video available for this lesson
@@ -667,7 +668,7 @@ const ContinueCourse = () => {
               {prevLesson && (
                 <button
                   onClick={() => handleLessonClick(prevLesson.id)}
-                  className="flex items-center px-5 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center px-5 py-3 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   aria-label="Previous lesson"
                 >
                   <ChevronLeft size={20} className="mr-2" />
@@ -678,7 +679,7 @@ const ContinueCourse = () => {
               {nextLesson && (
                 <button
                   onClick={() => handleLessonClick(nextLesson.id)}
-                  className="flex items-center px-5 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center px-5 py-3 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   aria-label="Next lesson"
                 >
                   Next

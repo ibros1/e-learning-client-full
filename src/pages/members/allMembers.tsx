@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store/store";
 import { listUsersFn } from "../../store/slices/auth/user/getAllUsers";
+import MembersPageSkeleton from "../../components/ui/MembersPageSkeleton";
 
 const MembersPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,6 +71,9 @@ const MembersPage = () => {
         </p>
       </div>
     );
+  }
+  if (allUsersState.loading) {
+    return <MembersPageSkeleton />;
   }
 
   if (!members.length) {

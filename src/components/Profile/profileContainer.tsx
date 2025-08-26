@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 
 import { updateWhoAmiRedu } from "../../store/slices/auth/user/getMe";
 import Spinner from "../spinner";
+import MyProfileSkeleton from "../ui/myProfileSkeleton";
 
 const MyProfileContainer = () => {
   const userState = useSelector((state: RootState) => state.WhoAmiSlice);
@@ -105,12 +106,15 @@ const MyProfileContainer = () => {
     // );
   };
 
-  if (!userState.data.isSuccess || !user) {
+  if (!user) {
     return (
       <p className="text-red-600 text-center font-bold text-2xl">
         Please login first.
       </p>
     );
+  }
+  if (userState.loading) {
+    return <MyProfileSkeleton />;
   }
 
   const profileImageUrl = user.profilePhoto ? `${user.profilePhoto}` : "";

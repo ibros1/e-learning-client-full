@@ -112,6 +112,7 @@ const Chapters = () => {
 
     if (deleteChapterState.data?.isSuccess) {
       toast.success("Chapter deleted successfully!");
+      dispatch(listChaptersFn());
       dispatch(resetDeleteChapterState());
       setIsDeleteDialogOpen(false);
     }
@@ -170,7 +171,6 @@ const Chapters = () => {
         <table className="min-w-full text-sm text-left">
           <thead className="bg-muted/50">
             <tr className="text-sm font-semibold text-muted-foreground uppercase">
-              <th className="px-4 py-3 whitespace-nowrap">#</th>
               <th className="px-4 py-3">Chapter Title</th>
               <th className="px-4 py-3">Course ID</th>
               <th className="px-4 py-3">Course Title</th>
@@ -196,9 +196,6 @@ const Chapters = () => {
                   key={chapter.id}
                   className="hover:bg-muted transition-colors"
                 >
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                    #{chapter.id}
-                  </td>
                   <td className="px-4 py-3 max-w-[180px] truncate">
                     {chapter.chapterTitle}
                   </td>

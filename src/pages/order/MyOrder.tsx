@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../store/store";
 import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
+import MyOrderSkeleton from "../../components/ui/orderSkeleton";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -66,6 +67,10 @@ const MyOrder = () => {
         Please log in to view your orders.
       </div>
     );
+  }
+
+  if (listEnrollementsState.loading) {
+    return <MyOrderSkeleton />;
   }
 
   return (

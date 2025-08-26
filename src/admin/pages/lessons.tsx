@@ -6,20 +6,37 @@ import {
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Eye, Pencil, Search, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Eye,
+  Pencil,
+  Search,
+  Trash2,
+  Clock,
+  Calendar,
+  Star,
+} from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import CreateLessonDailog from "../components/lessons/createLessonDailog";
 import { Button } from "../../components/ui/button";
 import { type AppDispatch, type RootState } from "../../store/store";
 import { listLessonsFn } from "../../store/slices/lessons/listLessons";
-
 import { listChaptersFn } from "../../store/slices/chapters/listChapters";
+import { listCoursesFn } from "../../store/slices/courses/listCourse";
+import {
+  resetUpdateLessonState,
+  updateLessonFn,
+} from "../../store/slices/lessons/updateLesson";
+import {
+  deleteLessonFn,
+  resetDeleteLessonState,
+} from "../../store/slices/lessons/deleteLesson";
+
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "../../components/ui/dialog";
@@ -36,22 +53,15 @@ import {
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
-import { listCoursesFn } from "../../store/slices/courses/listCourse";
-
-import {
-  resetUpdateLessonState,
-  updateLessonFn,
-} from "../../store/slices/lessons/updateLesson";
+import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
+import Spinner from "../../components/spinner";
 import toast from "react-hot-toast";
 import type { Lesson } from "../../types/lesson";
+import { Badge } from "../../components/ui/badge";
 
-import {
-  deleteLessonFn,
-  resetDeleteLessonState,
-} from "../../store/slices/lessons/deleteLesson";
-import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
-
-import Spinner from "../../components/spinner";
+import type { SourceInfo } from "plyr";
+import Plyr from "plyr-react";
+import { BASE_API_URL } from "../../constants/base_url";
 
 const Lessons = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,9 +71,29 @@ const Lessons = () => {
     (state: RootState) => state.listLessonSlice
   );
 
+  const coursesState = useSelector(
+    (state: RootState) => state.listCoursesSlice
+  );
+  const courses = coursesState.data?.courses;
+
+  const chaptersState = useSelector(
+    (state: RootState) => state.listChaptersSlice
+  );
+  const chapters = chaptersState.data?.chapters;
+
+  const logInState = useSelector((state: RootState) => state.loginSlice);
+
+  const updateState = useSelector(
+    (state: RootState) => state.updateLessonSlice
+  );
+  const deleteState = useSelector(
+    (state: RootState) => state.deleteLessonSlice
+  );
+
   useEffect(() => {
     dispatch(listChaptersFn());
     dispatch(listCoursesFn());
+    dispatch(listLessonsFn());
   }, [dispatch]);
 
   const lessons = listLessonState.data?.lessons
@@ -81,16 +111,6 @@ const Lessons = () => {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-  const coursesState = useSelector(
-    (state: RootState) => state.listCoursesSlice
-  );
-  const courses = coursesState.data?.courses;
-
-  const chaptersState = useSelector(
-    (state: RootState) => state.listChaptersSlice
-  );
-  const chapters = chaptersState.data?.chapters;
-
   const stats = {
     totalLessons: listLessonState.data?.lessons?.length || 0,
     completed: 18,
@@ -98,25 +118,16 @@ const Lessons = () => {
     totalChapters: 7,
   };
 
-  useEffect(() => {
-    dispatch(listLessonsFn());
-  }, [dispatch]);
-  const logInState = useSelector((state: RootState) => state.loginSlice);
-
-  // update
-  const [, setSelectedLesson] = useState<Lesson | null>(null);
+  // ───────────── UPDATE LESSON ─────────────
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState("");
   const [selectedChapterId, setSelectedChapterId] = useState("");
-
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
 
-  const updateState = useSelector(
-    (state: RootState) => state.updateLessonSlice
-  );
   const updateLessonHandler = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(
@@ -125,8 +136,8 @@ const Lessons = () => {
         chapterId: selectedChapterId,
         userId: logInState.data?.user?.id,
         courseId: +selectedCourseId,
-        title: title,
-        content: content,
+        title,
+        content,
         video_url: videoUrl,
       })
     );
@@ -136,42 +147,103 @@ const Lessons = () => {
     if (updateState.error) {
       toast.error(updateState.error);
       setIsEditDialogOpen(false);
-      return;
     }
     if (updateState.data?.isSuccess) {
       toast.success("Successfully updated lesson!");
-
       setIsEditDialogOpen(false);
       dispatch(resetUpdateLessonState());
       dispatch(listLessonsFn());
     }
   }, [updateState, dispatch]);
 
-  // delete
+  // ───────────── DELETE LESSON ─────────────
   const [isDeletedDailogOpen, setIsDeletedDailogOpen] = useState(false);
-  const lessonId = selectedLessonId;
   const deleteLessonHandler = () => {
-    dispatch(deleteLessonFn(lessonId));
+    dispatch(deleteLessonFn(selectedLessonId));
   };
-  const deleteState = useSelector(
-    (state: RootState) => state.deleteLessonSlice
-  );
+
   useEffect(() => {
-    if (deleteState.error) {
-      toast.error(deleteState.error);
-      return;
-    }
-    if (deleteState.data.isSuccess) {
+    if (deleteState.error) toast.error(deleteState.error);
+    if (deleteState.data?.isSuccess) {
       toast.success("Successfully Deleted Lesson!");
       dispatch(resetDeleteLessonState());
       dispatch(listLessonsFn());
     }
   }, [deleteState, dispatch]);
-  const lessonsList = useSelector((state: RootState) => state.listLessonSlice);
 
-  if (lessonsList.loading) {
-    return <LessonsSkeleton />;
-  }
+  // ───────────── VIDEO MODAL ─────────────
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // Plyr source configuration
+
+  const formatVideoUrl = (url: string) => {
+    if (!url) return "";
+
+    try {
+      const urlObj = new URL(url);
+      urlObj.pathname = urlObj.pathname
+        .split("/")
+        .map((segment) => encodeURIComponent(decodeURIComponent(segment)))
+        .join("/");
+
+      return urlObj.toString();
+    } catch {
+      const encodedPath = encodeURIComponent(url.trim()).replace(/%2F/g, "/");
+      return url.startsWith("http") ? url : `${BASE_API_URL}/${encodedPath}`;
+    }
+  };
+  const getYouTubeId = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname === "youtu.be") return urlObj.pathname.slice(1);
+      if (urlObj.hostname.includes("youtube.com"))
+        return urlObj.searchParams.get("v") || "";
+    } catch {
+      return "";
+    }
+    return "";
+  };
+  const source: SourceInfo = useMemo(() => {
+    const url = selectedLesson?.video_url || "";
+    const youtubeId = getYouTubeId(url);
+
+    if (youtubeId) {
+      return {
+        type: "video",
+        sources: [
+          {
+            src: youtubeId,
+            provider: "youtube",
+          },
+        ],
+        youtube: {
+          noCookie: true,
+          rel: 0,
+          showinfo: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+        },
+      };
+    } else {
+      return {
+        type: "video",
+        sources: [
+          {
+            src: formatVideoUrl(url),
+            type: "video/mp4",
+          },
+        ],
+      };
+    }
+  }, [selectedLesson?.video_url]);
+
+  const openVideoModal = (lesson: Lesson) => {
+    setSelectedLesson(lesson.video_url);
+    setSelectedLesson(lesson);
+    setIsVideoModalOpen(true);
+  };
+
+  if (listLessonState.loading) return <LessonsSkeleton />;
 
   return (
     <div className="p-6 min-h-screen bg-white dark:bg-[#0b1120] text-foreground space-y-8">
@@ -232,8 +304,8 @@ const Lessons = () => {
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Content</th>
               <th className="px-4 py-3">Chapter</th>
-              <th className="px-4 py-3">Course_Title</th>
-              <th className="px-4 py-3">Course_ID</th>
+              <th className="px-4 py-3">Course</th>
+              <th className="px-4 py-3">Course ID</th>
               <th className="px-4 py-3">Instructor</th>
               <th className="px-4 py-3">Created</th>
               <th className="px-4 py-3 text-center">Video</th>
@@ -253,40 +325,35 @@ const Lessons = () => {
                   {lesson.chapters?.chapterTitle ?? "N/A"}
                 </td>
                 <td className="px-4 py-3 max-w-[160px] truncate">
-                  {lesson.courses.title ?? "N/A"}
+                  {lesson.courses?.title ?? "N/A"}
                 </td>
-
                 <td className="px-4 py-3 whitespace-nowrap">
                   #{lesson.courseId}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={`${lesson.users.profilePhoto}`}
-                      alt={lesson.users.full_name}
-                      className="w-8 h-8 rounded-full object-cover border"
-                    />
-                    <span className="truncate">{lesson.users.full_name}</span>
-                  </div>
+                <td className="px-4 py-3 whitespace-nowrap flex items-center gap-2">
+                  <img
+                    src={lesson.users.profilePhoto}
+                    alt={lesson.users.full_name}
+                    className="w-8 h-8 rounded-full object-cover border"
+                  />
+                  <span className="truncate">{lesson.users.full_name}</span>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                  {new Date(lesson.created_at).toLocaleDateString("en-Us", {
+                  {new Date(lesson.created_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
                     day: "2-digit",
                   })}
                 </td>
                 <td className="px-4 py-3 text-center whitespace-nowrap">
-                  <a
-                    href={lesson.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openVideoModal(lesson)}
                   >
-                    <Button size="sm" variant="outline">
-                      <Eye className="w-4 h-4 mr-1" />
-                      Watch
-                    </Button>
-                  </a>
+                    <Eye className="w-4 h-4 mr-1" />
+                    Watch
+                  </Button>
                 </td>
                 <td className="px-4 py-3 text-center whitespace-nowrap space-x-2">
                   <Button
@@ -294,7 +361,6 @@ const Lessons = () => {
                     variant="outline"
                     onClick={() => {
                       setSelectedLessonId(lesson.id);
-
                       setSelectedCourseId(lesson.courseId.toString());
                       setSelectedChapterId(lesson.chapterId.toString());
                       setSelectedLesson(lesson);
@@ -312,7 +378,6 @@ const Lessons = () => {
                     variant="destructive"
                     onClick={() => {
                       setIsDeletedDailogOpen(true);
-
                       setSelectedLessonId(lesson.id);
                     }}
                   >
@@ -335,25 +400,131 @@ const Lessons = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Video Modal */}
+      <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
+        <DialogContent className="w-full max-w-4xl h-full max-h-[90vh] p-0 rounded-xl bg-black text-white border-0 overflow-y-auto">
+          {/* Video Container */}
+          <div className="absolute px-3 w-full aspect-video">
+            <Plyr source={source} />
+          </div>
+
+          {/* Lesson Details */}
+          <div className=" mt-[250px] sm:mt-[450px] md:mt-[500px] lg:mt-[500px] p-4 md:p-6 z-50  space-y-4">
+            {/* Title + Badge */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <h2 className="text-lg md:text-2xl font-bold">
+                {selectedLesson?.title}
+              </h2>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="bg-red-600 text-white border-0 text-xs md:text-sm"
+                >
+                  HD
+                </Badge>
+              </div>
+            </div>
+
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-gray-300">
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>45 min</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  {selectedLesson?.created_at
+                    ? new Date(selectedLesson.created_at).toLocaleDateString()
+                    : "N/A"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span>4.8 (120 reviews)</span>
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs md:text-sm">
+                Education
+              </Badge>
+              <Badge variant="secondary" className="text-xs md:text-sm">
+                {selectedLesson?.chapters?.chapterTitle}
+              </Badge>
+              <Badge variant="secondary" className="text-xs md:text-sm">
+                Lesson
+              </Badge>
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-300 leading-relaxed text-sm md:text-base">
+              {selectedLesson?.content ||
+                "No description available for this lesson."}
+            </p>
+
+            {/* Instructor */}
+            <div className="pt-4 border-t border-gray-800">
+              <h3 className="font-semibold mb-3 text-base md:text-lg">
+                Instructor
+              </h3>
+              <div className="flex items-center gap-3">
+                <img
+                  src={selectedLesson?.users?.profilePhoto}
+                  alt={selectedLesson?.users?.full_name}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border border-gray-600"
+                />
+                <div>
+                  <div className="font-medium text-sm md:text-base">
+                    {selectedLesson?.users?.full_name}
+                  </div>
+                  <div className="text-xs md:text-sm text-gray-400">
+                    Course Instructor
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress */}
+            <div className="pt-4 border-t border-gray-800">
+              <h3 className="font-semibold mb-2 text-base md:text-lg">
+                Course Progress
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs md:text-sm">
+                  <span>Completed</span>
+                  <span>25%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-700 rounded-full">
+                  <div
+                    className="h-full bg-red-600 rounded-full"
+                    style={{ width: "25%" }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ───────────── UPDATE DIALOG ───────────── */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <form onSubmit={updateLessonHandler} className="space-y-6">
-            <AlertDialogHeader>
-              <DialogTitle>Update Lesson</DialogTitle>
-              <DialogDescription>
-                Make changes to this lesson’s content below.
-              </DialogDescription>
-            </AlertDialogHeader>
+            <DialogTitle>Update Lesson</DialogTitle>
 
             <div className="grid gap-4">
-              {/* Course Selection */}
               <div className="grid gap-2">
                 <Label htmlFor="course">Course</Label>
                 <select
                   id="course"
-                  className="border rounded-xl py-2 px-3 w-full"
                   value={selectedCourseId || ""}
                   onChange={(e) => setSelectedCourseId(e.target.value)}
+                  className="border rounded-xl py-2 px-3 w-full"
                   required
                 >
                   <option value="">-- Choose Course --</option>
@@ -365,22 +536,18 @@ const Lessons = () => {
                 </select>
               </div>
 
-              {/* Chapter Selection */}
               <div className="grid gap-2">
                 <Label htmlFor="chapter">Chapter</Label>
                 <select
                   id="chapter"
-                  className="border rounded-xl py-2 px-3 w-full"
                   value={selectedChapterId}
                   onChange={(e) => setSelectedChapterId(e.target.value)}
+                  className="border rounded-xl py-2 px-3 w-full"
                   required
                 >
                   <option value="">-- Choose Chapter --</option>
                   {chapters
-                    ?.filter(
-                      (chapter) =>
-                        chapter.courseId.toString() === selectedCourseId
-                    )
+                    ?.filter((c) => c.courseId.toString() === selectedCourseId)
                     .map((chapter) => (
                       <option key={chapter.id} value={chapter.id}>
                         {chapter.chapterTitle}
@@ -389,55 +556,49 @@ const Lessons = () => {
                 </select>
               </div>
 
-              {/* Title */}
               <div className="grid gap-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
-                  value={title || ""}
+                  value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
 
-              {/* Content */}
               <div className="grid gap-2">
                 <Label htmlFor="content">Content</Label>
                 <Textarea
                   id="content"
-                  value={content || ""}
+                  value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={4}
                 />
               </div>
 
-              {/* Video URL */}
               <div className="grid gap-2">
                 <Label htmlFor="videoUrl">Video URL</Label>
                 <Input
                   id="videoUrl"
-                  value={videoUrl || ""}
+                  value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                 />
               </div>
             </div>
 
-            {/* Footer Buttons */}
-            <DialogFooter className="pt-4 flex justify-end gap-2">
+            <DialogFooter className="flex justify-end gap-2 pt-4">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button
-                disabled={updateState.loading}
-                type="submit"
-                className="bg-blue-600 disabled:bg-gray-500 disabled:hover:bg-gray-600 disabled:cursor-not-allowed hover:bg-blue-700 text-white px-6 py-2 rounded-full"
-              >
+              <Button type="submit" disabled={updateState.loading}>
                 {updateState.loading ? <Spinner /> : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ───────────── DELETE DIALOG ───────────── */}
       <AlertDialog
         open={isDeletedDailogOpen}
         onOpenChange={setIsDeletedDailogOpen}
@@ -445,20 +606,19 @@ const Lessons = () => {
         <AlertDialogContent className="rounded-2xl p-6 shadow-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-              Are you absolutely sure to delete this lesson?
+              Are you sure to delete this lesson?
             </AlertDialogTitle>
             <AlertDialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
-              This action cannot be undone. This will permanently delete the
-              lessons! and remove it from the server.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex justify-end gap-4">
-            <AlertDialogCancel className="px-6 py-2 rounded-lg border border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <AlertDialogFooter className="flex justify-end gap-4 mt-6">
+            <AlertDialogCancel className="px-6 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
+              className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
               onClick={deleteLessonHandler}
-              className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
             >
               Delete
             </AlertDialogAction>
