@@ -11,7 +11,7 @@ import { useNavigate } from "react-router";
 
 const Profile = () => {
   // const navigate = useNavigate();
-  const userState = useSelector((state: RootState) => state.WhoAmiSlice);
+  const userState = useSelector((state: RootState) => state.loginSlice);
   const dispatch = useDispatch();
   const user = userState.data?.user;
   const fullName = user?.full_name || "Guest";
