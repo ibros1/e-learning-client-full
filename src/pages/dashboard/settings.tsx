@@ -54,6 +54,12 @@ const SettingsPage: React.FC = () => {
     formData.append("fullName", fullName);
     formData.append("phone_number", phone);
 
+    if (newPassword === "") {
+      toast.dismiss();
+      toast.error("Enter a current or new password first");
+      return;
+    }
+
     if (currentPassword && newPassword) {
       formData.append("password", newPassword);
     }
