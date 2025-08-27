@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { BASE_API_URL } from "../../../constants/base_url";
 import type { AppDispatch, RootState } from "../../../store/store";
 import { getOneUserFn } from "../../../store/slices/auth/user/getOneUser";
 import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnrollements";

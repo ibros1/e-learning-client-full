@@ -104,11 +104,6 @@ const Chapters = () => {
     ? [...listChaptersState.data.chapters]
     : [];
 
-  const sortedChapters = chapters.sort(
-    (a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-
   const updateChapterState = useSelector(
     (state: RootState) => state.updateChapterSlice
   );
@@ -557,7 +552,7 @@ const Chapters = () => {
                 <td className="p-3">{chapter.lesson.length}</td>
                 <td className="p-3">
                   {chapter.lesson.length > 0 ? (
-                    <Badge variant="success">Has Lessons</Badge>
+                    <Badge variant="destructive">Has Lessons</Badge>
                   ) : (
                     <Badge variant="secondary">No Lessons</Badge>
                   )}
