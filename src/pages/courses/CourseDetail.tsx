@@ -103,6 +103,8 @@ const CourseDetailPage = () => {
       enrl.courseId === course.id
   );
 
+  const firstLesson = course.lesson.map((lesson) => lesson.id[0]);
+
   return (
     <div className="bg-gray-50 dark:bg-[#091025] min-h-screen text-gray-800 dark:text-gray-200">
       {/* Floating Action Buttons */}
@@ -232,7 +234,9 @@ const CourseDetailPage = () => {
                       whileTap={{ scale: 0.98 }}
                       className="w-full bg-blue-600 rounded-md text-white px-6 py-3  font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
                       onClick={() =>
-                        navigate(`/my-courses/continue/${course.id}`)
+                        navigate(
+                          `/my-courses/continue/${course.id}/${firstLesson}`
+                        )
                       }
                     >
                       <Play size={20} /> Continue Learning

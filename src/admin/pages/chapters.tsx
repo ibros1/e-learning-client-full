@@ -552,7 +552,7 @@ const Chapters = () => {
                 <td className="p-3">{chapter.lesson.length}</td>
                 <td className="p-3">
                   {chapter.lesson.length > 0 ? (
-                    <Badge variant="destructive">Has Lessons</Badge>
+                    <Badge variant="outline">Has Lessons</Badge>
                   ) : (
                     <Badge variant="secondary">No Lessons</Badge>
                   )}
