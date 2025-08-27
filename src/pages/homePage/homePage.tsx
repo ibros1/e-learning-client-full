@@ -241,64 +241,67 @@ export default function HomePage() {
 
       {/* Continue Learning Section */}
       {enrollments && enrollments.length > 0 && (
-        <section className="mx-auto px-4 sm:px-6 py-8 md:py-12 ">
+        <section className="mx-auto px-4 sm:px-6 py-8 md:py-12">
           <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">
             Continue Your Course
           </h2>
           <div className="space-y-4">
-            {enrollments.map((c) => {
-              const courseTotalLessons =
-                totalLessons.find((t) => t.courseId === c.courseId)
-                  ?.lessonsCount || 0;
-              const completedCount =
-                completedLessonsState.data?.completed?.filter(
-                  (lesson) => lesson.courseId === c.courseId
-                ).length || 0;
-              const progressPercent =
-                courseTotalLessons > 0
-                  ? (completedCount / courseTotalLessons) * 100
-                  : 0;
+            {enrollments
+              .filter((c) => c.is_enrolled && c.status === "COMPLETED")
+              .slice(-3) // take last 3 enrolled courses
+              .map((c) => {
+                const courseTotalLessons =
+                  totalLessons.find((t) => t.courseId === c.courseId)
+                    ?.lessonsCount || 0;
+                const completedCount =
+                  completedLessonsState.data?.completed?.filter(
+                    (lesson) => lesson.courseId === c.courseId
+                  ).length || 0;
+                const progressPercent =
+                  courseTotalLessons > 0
+                    ? (completedCount / courseTotalLessons) * 100
+                    : 0;
 
-              return (
-                <motion.div
-                  key={c.id}
-                  whileHover={{ y: -2 }}
-                  className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
-                >
-                  <div className="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
-                    <img
-                      src={`${c.course.course_img}`}
-                      alt={c.course.title || "Course"}
-                      className="w-16 h-12 sm:w-20 sm:h-14 rounded-lg object-cover shadow-md flex-shrink-0"
-                      loading="lazy"
-                    />
-                    <div className="min-w-0 flex-1 sm:flex-none">
-                      <h4 className="text-base sm:text-lg truncate font-medium text-gray-900 dark:text-gray-100 ">
-                        {c.course.title.length > 50
-                          ? c.course.title.slice(0, 50) + "...."
-                          : c.course.title || "Untitled Course"}
-                      </h4>
-                      <div className="mt-1 sm:mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3 w-full overflow-hidden">
-                        <div
-                          className="bg-blue-600 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                        {progressPercent.toFixed()}% Complete
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigateToCourse(c.courseId)}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-full font-medium shadow-sm sm:shadow-md transition-colors duration-300 text-sm sm:text-base"
+                return (
+                  <motion.div
+                    key={c.id}
+                    whileHover={{ y: -2 }}
+                    className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
                   >
-                    Continue
-                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
-                </motion.div>
-              );
-            })}
+                    <div className="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
+                      <img
+                        src={c.course.course_img}
+                        alt={c.course.title || "Course"}
+                        className="w-16 h-12 sm:w-20 sm:h-14 rounded-lg object-cover shadow-md flex-shrink-0"
+                        loading="lazy"
+                      />
+                      <div className="min-w-0 flex-1 sm:flex-none">
+                        <h4 className="text-base sm:text-lg truncate font-medium text-gray-900 dark:text-gray-100">
+                          {c.course.title.length > 50
+                            ? c.course.title.slice(0, 50) + "..."
+                            : c.course.title || "Untitled Course"}
+                        </h4>
+                        <div className="mt-1 sm:mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3 w-full overflow-hidden">
+                          <div
+                            className="bg-blue-600 h-full rounded-full transition-all duration-500"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          {progressPercent.toFixed()}% Complete
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigateToCourse(c.courseId)}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-full font-medium shadow-sm sm:shadow-md transition-colors duration-300 text-sm sm:text-base"
+                    >
+                      Continue
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </button>
+                  </motion.div>
+                );
+              })}
           </div>
         </section>
       )}

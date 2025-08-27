@@ -47,6 +47,7 @@ const SettingsPage: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     const formData = new FormData();
     formData.append("id", userId.toString());
     formData.append("email", email);
@@ -54,13 +55,11 @@ const SettingsPage: React.FC = () => {
     formData.append("fullName", fullName);
     formData.append("phone_number", phone);
 
-    if (newPassword === "") {
-      toast.dismiss();
-      toast.error("Enter a current or new password first");
-      return;
-    }
-
-    if (currentPassword && newPassword) {
+    if (newPassword) {
+      if (!currentPassword) {
+        toast.error("Enter your current password to set a new one");
+        return;
+      }
       formData.append("password", newPassword);
     }
 
