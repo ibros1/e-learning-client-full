@@ -1,28 +1,81 @@
 // components/SettingsPage.tsx
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
-import Spinner from "../../components/spinner";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import {
+  updateUserFn,
+  resetUpdateUserFn,
+} from "../../store/slices/auth/user/updateUser";
 import { Switch } from "@radix-ui/react-switch";
+import toast from "react-hot-toast";
+import SettingsPageSkeleton from "../../components/ui/SettingsPageSkeleton";
+import { WhoAmiFn } from "../../store/slices/auth/user/getMe";
 
 const SettingsPage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const logInState = useSelector((state: RootState) => state.loginSlice);
+
+  useEffect(() => {
+    dispatch(WhoAmiFn());
+  }, [dispatch]);
+
+  const logInState = useSelector((state: RootState) => state.WhoAmiSlice);
+  const updateState = useSelector((state: RootState) => state.updateUserSlice);
   const user = logInState?.data?.user;
 
+  // Form states
+  const [fullName, setFullName] = useState(user?.full_name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone_number || "");
+  const [location, setLocation] = useState("Hargeisa");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
-  if (logInState.loading) return <Spinner />;
+  useEffect(() => {
+    setFullName(user?.full_name || "");
+    setEmail(user?.email || "");
+    setPhone(user?.phone_number || "");
+  }, [user]);
+
+  if (logInState.loading) return <SettingsPageSkeleton />;
   if (logInState.error) return <div>{logInState.error}</div>;
 
-  return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-10 px-4">
+  const userId = Number(user?.id);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("id", userId.toString());
+    formData.append("email", email);
+    formData.append("username", user!.username);
+    formData.append("fullName", fullName);
+    formData.append("phone_number", phone);
+
+    if (currentPassword && newPassword) {
+      formData.append("password", newPassword);
+    }
+
+    try {
+      await dispatch(updateUserFn(formData)).unwrap();
+      toast.success("Profile updated successfully!");
+      dispatch(WhoAmiFn());
+      dispatch(resetUpdateUserFn());
+    } catch (err: any) {
+      toast.error(err || "Failed to update profile");
+    }
+  };
+
+  return !user ? (
+    <div>User not Found</div>
+  ) : (
+    <div className="min-h-screen bg-gray-100 dark:bg-[#091025] py-10 px-4">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10">
         {/* Sidebar */}
         <aside
-          className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center md:sticky md:top-20 md:h-fit cursor-pointer md:w-80 hover:shadow-lg transition-shadow"
+          className="bg-white dark:bg-[#091025] rounded-xl shadow border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center md:sticky md:top-20 md:h-fit cursor-pointer md:w-80 hover:shadow-lg transition-shadow"
           onClick={() => navigate("/my-profile")}
           role="button"
           tabIndex={0}
@@ -34,7 +87,7 @@ const SettingsPage: React.FC = () => {
           <div className="w-full h-28 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
             {user.coverPhoto ? (
               <img
-                src={`${user.coverPhoto}`}
+                src={user.coverPhoto}
                 alt="cover"
                 className="w-full h-full object-cover"
               />
@@ -42,24 +95,22 @@ const SettingsPage: React.FC = () => {
               <div className="w-full h-full bg-gradient-to-r from-blue-400 to-blue-600" />
             )}
 
-            {/* Profile photo overlaps the bottom of the cover */}
+            {/* Profile Photo */}
             <div className="z-10">
               <img
-                src={`${user.profilePhoto}`}
+                src={user.profilePhoto}
                 alt="avatar"
-                className="absolute -mt-12 left-1/2 transform -translate-x-1/2 w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-md"
+                className="absolute -mt-12 left-1/2 transform -translate-x-1/2 w-24 h-24 rounded-full object-cover border-4 border-white dark:border-[#091025] shadow-md"
               />
             </div>
           </div>
 
-          {/* Spacing to offset avatar overlap */}
+          {/* User Info */}
           <div className="mt-16 text-center px-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {user.full_name}
             </h2>
-            <p className="text-sm text-blue-600 mt-1">
-              @{user.full_name.split(" ")[0]}
-            </p>
+            <p className="text-sm text-blue-600 mt-1">@{user.username}</p>
           </div>
 
           <div className="flex gap-8 mt-6 text-center text-sm text-gray-700 dark:text-gray-300 font-medium">
@@ -92,12 +143,15 @@ const SettingsPage: React.FC = () => {
         </aside>
 
         {/* Settings Content */}
-        <div className="flex-1 max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 space-y-10">
+        <form
+          onSubmit={handleSubmit}
+          className="flex-1 max-w-4xl bg-white dark:bg-[#091025] border dark:border-gray-600 shadow-xl rounded-2xl p-8 space-y-10"
+        >
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
             Account Settings
           </h1>
 
-          {/* Profile Settings */}
+          {/* Profile */}
           <section>
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
               Profile
@@ -106,25 +160,27 @@ const SettingsPage: React.FC = () => {
               {[
                 {
                   label: "Full Name",
+                  value: fullName,
+                  setter: setFullName,
                   type: "text",
-                  value: user.full_name,
-                  placeholder: "John Doe",
                 },
                 {
                   label: "Email Address",
+                  value: email,
+                  setter: setEmail,
                   type: "email",
-                  value: user.email,
-                  placeholder: "example@email.com",
                 },
                 {
                   label: "Phone Number",
+                  value: phone,
+                  setter: setPhone,
                   type: "tel",
-                  placeholder: "+252 61 1234567",
                 },
                 {
                   label: "Location",
+                  value: location,
+                  setter: setLocation,
                   type: "text",
-                  placeholder: "Hargeisa, Somaliland",
                 },
               ].map((field, idx) => (
                 <div key={idx}>
@@ -133,9 +189,10 @@ const SettingsPage: React.FC = () => {
                   </label>
                   <input
                     type={field.type}
-                    placeholder={field.placeholder}
-                    defaultValue={field.value}
-                    className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    value={field.value}
+                    onChange={(e) => field.setter(e.target.value)}
+                    placeholder={field.label}
+                    className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-[#091025] dark:text-white"
                   />
                 </div>
               ))}
@@ -151,29 +208,18 @@ const SettingsPage: React.FC = () => {
               {[
                 {
                   title: "Email Notifications",
-                  description:
-                    "Get emails for activity like comments and follows.",
                   state: emailNotifications,
                   setter: setEmailNotifications,
                 },
-                {
-                  title: "Dark Mode",
-                  description: "Enable dark appearance across the app.",
-                  state: darkMode,
-                  setter: setDarkMode,
-                },
+                { title: "Dark Mode", state: darkMode, setter: setDarkMode },
               ].map((pref, idx) => (
                 <div key={idx} className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                      {pref.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {pref.description}
-                    </p>
-                  </div>
+                  <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {pref.title}
+                  </h3>
                   <Switch
                     checked={pref.state}
+                    onCheckedChange={pref.setter}
                     className={`${
                       pref.state
                         ? "bg-blue-600"
@@ -191,15 +237,23 @@ const SettingsPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Password */}
+          {/* Security */}
           <section>
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
               Security
             </h2>
             <div className="grid sm:grid-cols-2 gap-6">
               {[
-                { label: "Current Password", placeholder: "••••••••" },
-                { label: "New Password", placeholder: "New password" },
+                {
+                  label: "Current Password",
+                  value: currentPassword,
+                  setter: setCurrentPassword,
+                },
+                {
+                  label: "New Password",
+                  value: newPassword,
+                  setter: setNewPassword,
+                },
               ].map((pwd, idx) => (
                 <div key={idx}>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -207,17 +261,22 @@ const SettingsPage: React.FC = () => {
                   </label>
                   <input
                     type="password"
-                    placeholder={pwd.placeholder}
-                    className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    value={pwd.value}
+                    onChange={(e) => pwd.setter(e.target.value)}
+                    placeholder={pwd.label}
+                    className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-[#091025] dark:text-white"
                   />
                 </div>
               ))}
             </div>
-            <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-500 transition">
-              Save Changes
+            <button
+              type="submit"
+              className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-500 transition"
+            >
+              {updateState.loading ? "Saving..." : "Save Changes"}
             </button>
           </section>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -17,6 +17,14 @@ import EditEnrolls from "../components/enrolls/EditEnrolls";
 
 import DeleteEnrolls from "../components/enrolls/deleteEnrolls";
 import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 
 type StatusType = "ALL" | "COMPLETED" | "IN_PROGRESS" | "FAILED";
 
@@ -153,100 +161,105 @@ const Enrollments = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
-          <thead className="bg-gray-100 dark:bg-gray-800 text-xs uppercase font-semibold text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 whitespace-nowrap">#</th>
-              <th className="px-6 py-3 text-left">Full Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Course Title</th>
-              <th className="px-4 py-3">Course ID</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">Progress</th>
-              <th className="px-4 py-3">Enrolled</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="w-full overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+        <Table className="min-w-[1200px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="min-w-[60px]">#</TableHead>
+              <TableHead className="min-w-[220px]">Full Name</TableHead>
+              <TableHead className="min-w-[260px]">Email</TableHead>
+              <TableHead className="min-w-[140px]">Phone</TableHead>
+              <TableHead className="min-w-[220px]">Course Title</TableHead>
+              <TableHead className="min-w-[120px]">Course ID</TableHead>
+              <TableHead className="min-w-[120px]">Price</TableHead>
+              <TableHead className="min-w-[120px]">Progress</TableHead>
+              <TableHead className="min-w-[120px]">Enrolled</TableHead>
+              <TableHead className="min-w-[140px]">Status</TableHead>
+              <TableHead className="min-w-[160px]">Created</TableHead>
+              <TableHead className="min-w-[140px] text-center">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
             {filteredEnrollments.length === 0 ? (
-              <tr>
-                <td
+              <TableRow>
+                <TableCell
                   colSpan={12}
                   className="text-center py-6 text-gray-500 dark:text-gray-400"
                 >
                   No enrollments found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               filteredEnrollments.map((enr) => (
-                <tr
+                <TableRow
                   key={enr.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                  <TableCell className="text-muted-foreground">
                     {enr.id}
-                  </td>
-                  <td className="px-6 py-2 flex items-center gap-2 whitespace-nowrap">
-                    <img
-                      src={`${enr.users!.profilePhoto}`}
-                      alt={enr.users!.full_name}
-                      className="w-10 h-10 rounded-full object-cover shadow"
-                    />
-                    <span>{enr.users!.full_name}</span>
-                  </td>
-                  <td className="px-4 py-2 max-w-[180px] truncate text-blue-700 dark:text-blue-400">
-                    <div className="flex gap-2 items-center">
-                      <Mail className="w-4 h-4" />
-                      <span>{enr.users!.email}</span>
+                  </TableCell>
+                  <TableCell className="truncate max-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={enr.users!.profilePhoto}
+                        alt={enr.users!.full_name}
+                        className="w-10 h-10 rounded-full object-cover shadow"
+                      />
+                      <span className="truncate">{enr.users!.full_name}</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-2">{enr.users!.phone_number}</td>
-                  <td className="px-4 py-2 max-w-[200px] truncate">
+                  </TableCell>
+
+                  <TableCell className="truncate max-w-[220px] text-blue-700 dark:text-blue-400">
+                    <div className="flex gap-2 items-center">
+                      <Mail className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{enr.users!.email}</span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>{enr.users!.phone_number}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">
                     {enr.course!.title}
-                  </td>
-                  <td className="px-4 py-2">{enr.course!.id}</td>
-                  <td className="px-4 py-2 text-green-600 dark:text-green-400">
+                  </TableCell>
+                  <TableCell>{enr.course!.id}</TableCell>
+                  <TableCell className="text-green-600 dark:text-green-400">
                     <BadgeDollarSign className="w-4 h-4 inline" /> $
                     {enr.course!.price}
-                  </td>
-                  <td className="px-4 py-2">{enr.progress}%</td>
-                  <td className="px-4 py-2">
-                    {String(enr.is_enrolled).toUpperCase()}
-                  </td>
-                  <td className="px-4 py-2">
+                  </TableCell>
+                  <TableCell>{enr.progress}%</TableCell>
+                  <TableCell>{String(enr.is_enrolled).toUpperCase()}</TableCell>
+                  <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         enr.status === "COMPLETED"
                           ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300"
                           : enr.status === "IN_PROGRESS"
-                          ? "bg-yellow-100    text-yellow-700 dark:bg-yellow-800 dark:text-yellow-300"
+                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-300"
                           : "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300"
                       }`}
                     >
                       {enr.status}
                     </span>
-                  </td>
-                  <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
+                  </TableCell>
+                  <TableCell className="text-xs text-gray-500 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <CalendarClock className="w-4 h-4" />
                       {new Date(enr.created_at).toLocaleDateString()}
                     </div>
-                  </td>
-                  <td className="px-4 py-2">
+                  </TableCell>
+                  <TableCell>
                     <div className="flex gap-2">
                       <EditEnrolls enrollement={enr} />
                       <DeleteEnrolls enrollement={enr} />
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

@@ -191,7 +191,7 @@ const GetOneUser = () => {
                   className="bg-white dark:bg-gray-900 border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition"
                 >
                   <img
-                    src={`${BASE_API_URL}/uploads/${course.course_img}`}
+                    src={`${course.course_img}`}
                     alt={course.title}
                     className="w-full h-36 object-cover"
                   />

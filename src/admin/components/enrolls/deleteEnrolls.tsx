@@ -19,6 +19,7 @@ import {
 import type { Enrollement } from "../../../types/enrollement";
 import toast from "react-hot-toast";
 import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnrollements";
+import { Trash2 } from "lucide-react";
 
 type enrollementProps = {
   enrollement: Enrollement;
@@ -38,6 +39,10 @@ const DeleteEnrolls = ({ enrollement }: enrollementProps) => {
       toast.error(deleteEnrollState.error);
       return;
     }
+    if (deleteEnrollState.loading) {
+      toast.loading("deleting...");
+      return;
+    }
     if (deleteEnrollState.data.isSuccess) {
       toast.dismiss();
       toast.success("Successfully deleted!");
@@ -48,10 +53,12 @@ const DeleteEnrolls = ({ enrollement }: enrollementProps) => {
   return (
     <div>
       <Button
-        className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1"
+        variant="ghost"
+        size="icon"
+        className="hover:bg-red-100 dark:hover:bg-red-900"
         onClick={() => setIsDeletedDailogOpen(true)}
       >
-        Delete
+        <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
       </Button>
       <AlertDialog
         open={isDeletedDailogOpen}

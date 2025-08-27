@@ -8,8 +8,9 @@ import { Button } from "../../components/ui/button";
 
 import { listCoursesFn } from "../../store/slices/courses/listCourse";
 import { WhoAmiFn } from "../../store/slices/auth/user/getMe";
-import { Loader2 } from "lucide-react";
+
 import { getCompletedLessonsFn } from "../../store/lessonProggress/getCompletedProggress";
+import MyProfileSkeleton from "../../components/ui/myProfileSkeleton";
 
 const MyCourses: React.FC = () => {
   const navigate = useNavigate();
@@ -81,8 +82,8 @@ const MyCourses: React.FC = () => {
 
   if (!user || coursesState.loading || coursesState.data === null) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex justify-center items-center ">
+        <MyProfileSkeleton />
       </div>
     );
   }

@@ -24,6 +24,7 @@ import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnroll
 import { updatePaymentFn } from "../../../store/slices/payments/updatePayment";
 import { listPaymentsFn } from "../../../store/slices/payments/listPayments";
 import { WhoAmiFn } from "../../../store/slices/auth/user/getMe";
+import { Pencil } from "lucide-react";
 
 type EditEnrollProps = {
   enrollement: Enrollement;
@@ -97,10 +98,12 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
   return (
     <div>
       <Button
-        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-xs"
+        variant="ghost"
+        size="icon"
+        className="hover:bg-blue-100 dark:hover:bg-blue-900"
         onClick={() => setIsEditDialogOpen(true)}
       >
-        Edit
+        <Pencil className="w-4 h-4 text-blue-600 dark:text-blue-400" />
       </Button>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

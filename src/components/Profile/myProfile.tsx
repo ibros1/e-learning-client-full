@@ -2,11 +2,16 @@ import MyProfileContainer from "./profileContainer";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { Button } from "../ui/button";
+import MyProfileSkeleton from "../ui/myProfileSkeleton";
 
 const MyProfile = () => {
   const userState = useSelector((state: RootState) => state.WhoAmiSlice);
 
   const user = userState.data?.user;
+
+  if (userState.loading) {
+    return <MyProfileSkeleton />;
+  }
 
   if (!user) {
     return (
