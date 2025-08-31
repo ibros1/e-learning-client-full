@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfilePopupLinks from "./profilePopupLinks";
 
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();

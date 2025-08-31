@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfilePopupLinks from "./profilePopupLinks";
 import { resetLoginState } from "../../store/slices/auth/login";
 
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   // const navigate = useNavigate();

@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <CartProvider>
         <Provider store={store}>
-          <App /> {/* <RouterProvider> lives inside App */}
+          <App />
           <Toaster />
         </Provider>
       </CartProvider>

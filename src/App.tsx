@@ -12,14 +12,13 @@ const App = () => {
   useEffect(() => {
     dispatch(WhoAmiFn());
   }, [dispatch]);
-
   useEffect(() => {
     const saved = localStorage.getItem("dark");
     if (saved === "true") setIsDarkMode(true);
   }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
+    const root = window.document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
       localStorage.setItem("dark", "true");
@@ -29,7 +28,11 @@ const App = () => {
     }
   }, [isDarkMode]);
 
-  return <RouterProvider router={mainRoter} />;
+  return (
+    <>
+      <RouterProvider router={mainRoter} />
+    </>
+  );
 };
 
 export default App;

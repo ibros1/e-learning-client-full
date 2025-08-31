@@ -10,7 +10,7 @@ import {
   resetRegisterState,
 } from "../../store/slices/auth/register";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/spinner";
 const Register = () => {
   const registerState = useSelector((state: RootState) => state.registerSlice);

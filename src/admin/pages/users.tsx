@@ -22,7 +22,7 @@ import {
   DialogClose,
 } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { Label } from "../../components/ui/label";
 import {
   AlertDialogAction,
