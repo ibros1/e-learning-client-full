@@ -75,8 +75,12 @@ const Profile = () => {
               {firstName}
             </span>
             <div className="w-10 h-10">
-              <Avatar>
-                <AvatarImage src={profilePhoto} alt="Profile" />
+              <Avatar className="w-10 h-10  ring-4 ring-white dark:ring-[#0f172a] shadow-md">
+                <AvatarImage
+                  src={profilePhoto}
+                  alt="Profile"
+                  className="object-cover"
+                />
                 <AvatarFallback>{firstName.charAt(0)}</AvatarFallback>
               </Avatar>
             </div>
@@ -91,7 +95,11 @@ const Profile = () => {
               onClick={() => navigate("/my-profile")}
             >
               <Avatar className="w-12 h-12">
-                <AvatarImage src={profilePhoto} alt="Profile" />
+                <AvatarImage
+                  src={profilePhoto}
+                  alt="Profile"
+                  className="object-cover"
+                />
                 <AvatarFallback>
                   {`${fullName.split(" ")[0]} ${fullName.split(" ")[1] || ""}`}
                 </AvatarFallback>

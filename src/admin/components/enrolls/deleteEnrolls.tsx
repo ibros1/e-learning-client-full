@@ -36,10 +36,12 @@ const DeleteEnrolls = ({ enrollement }: enrollementProps) => {
   );
   useEffect(() => {
     if (deleteEnrollState.error) {
+      toast.dismiss();
       toast.error(deleteEnrollState.error);
       return;
     }
     if (deleteEnrollState.loading) {
+      toast.dismiss();
       toast.loading("deleting...");
       return;
     }
@@ -67,11 +69,11 @@ const DeleteEnrolls = ({ enrollement }: enrollementProps) => {
         <AlertDialogContent className="rounded-2xl p-6 shadow-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-              Are you absolutely sure to delete this course?
+              Are you absolutely sure to delete this Enrollement?
             </AlertDialogTitle>
             <AlertDialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
               This action cannot be undone. This will permanently delete the
-              course and remove it from the server.
+              Enrollement.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex justify-end gap-4">

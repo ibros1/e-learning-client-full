@@ -135,6 +135,7 @@ const Chapters = () => {
     }
 
     if (updateChapterState.data?.isSuccess) {
+      toast.dismiss();
       toast.success("Chapter updated successfully");
       dispatch(updateChapterRedu(updateChapterState.data.updatedChapter));
       dispatch(listChaptersFn());

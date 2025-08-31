@@ -145,10 +145,18 @@ const Lessons = () => {
 
   useEffect(() => {
     if (updateState.error) {
+      toast.dismiss();
       toast.error(updateState.error);
       setIsEditDialogOpen(false);
+      return;
+    }
+    if (updateState.loading) {
+      toast.dismiss();
+      toast.loading("Updating lesson...");
+      return;
     }
     if (updateState.data?.isSuccess) {
+      toast.dismiss();
       toast.success("Successfully updated lesson!");
       setIsEditDialogOpen(false);
       dispatch(resetUpdateLessonState());
@@ -163,8 +171,18 @@ const Lessons = () => {
   };
 
   useEffect(() => {
-    if (deleteState.error) toast.error(deleteState.error);
+    if (deleteState.error) {
+      toast.dismiss();
+      toast.error(deleteState.error);
+      return;
+    }
+    if (deleteState.loading) {
+      toast.dismiss();
+      toast.loading("Deleting...");
+      return;
+    }
     if (deleteState.data?.isSuccess) {
+      toast.dismiss();
       toast.success("Successfully Deleted Lesson!");
       dispatch(resetDeleteLessonState());
       dispatch(listLessonsFn());

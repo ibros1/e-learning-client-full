@@ -68,13 +68,19 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
 
   useEffect(() => {
     if (updateEnrollState.error) {
+      toast.dismiss();
       toast.error(updateEnrollState.error);
+      return;
+    }
+    if (updateEnrollState.loading) {
+      toast.dismiss();
+      toast.loading("Updating...");
       return;
     }
 
     if (updateEnrollState.data.isSuccess) {
       toast.dismiss();
-      toast.success("Successfully Completed");
+      toast.success("Successfully updated enrollement");
       dispatch(WhoAmiFn());
       dispatch(listEnrollementsFn());
       dispatch(resetUpdateEnrollementState());

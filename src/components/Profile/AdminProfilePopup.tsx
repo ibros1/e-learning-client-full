@@ -63,7 +63,11 @@ const Profile = () => {
 
             <div className="w-10 h-10">
               <Avatar>
-                <AvatarImage src={profilePhoto} alt="Profile" />
+                <AvatarImage
+                  src={profilePhoto}
+                  alt="Profile"
+                  className="object-cover"
+                />
                 <AvatarFallback>{firstName.charAt(0)}</AvatarFallback>
               </Avatar>
             </div>
@@ -75,7 +79,11 @@ const Profile = () => {
             {/* Header Section */}
             <div className="flex hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-800 items-center gap-4 px-4 pb-2 pt-4 border-b dark:border-gray-600">
               <Avatar className="w-12 h-12">
-                <AvatarImage src={profilePhoto} alt="Profile" />
+                <AvatarImage
+                  src={profilePhoto}
+                  alt="Profile"
+                  className="object-cover"
+                />
                 <AvatarFallback>
                   {`${fullName.split(" ")[0]} ${fullName.split(" ")[1] || ""}`}
                 </AvatarFallback>
