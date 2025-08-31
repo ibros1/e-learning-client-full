@@ -16,13 +16,14 @@ import {
 } from "../../store/slices/enrollments/createEnrollment";
 import toast from "react-hot-toast";
 import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
-import { useNavigate } from "react-router";
+
 import {
   createPaymentFn,
   resetCreatePaymentState,
 } from "../../store/slices/payments/createPayment";
 import { clearCart } from "../../store/slices/cart/cart";
 import CheckoutPageSkeleton from "../../components/ui/chceckoutSkeleton";
+import { useNavigate } from "react-router-dom";
 
 const paymentMethods = [
   {
@@ -59,9 +60,9 @@ const mapPaymentMethodLabelToEnum = (label: string) => {
   }
 };
 
-export default function CheckoutPage() {
-  const dispatch = useDispatch<AppDispatch>();
+export const CheckoutPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const logInState = useSelector((state: RootState) => state.WhoAmiSlice);
   const cartState = useSelector((state: RootState) => state.cart);
@@ -317,4 +318,4 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
-}
+};
