@@ -54,7 +54,7 @@ const CourseDetailPage = () => {
     if (courseId) dispatch(getOneCourseFn(+courseId));
   }, [dispatch, courseId]);
   const enrollementsLoading = useSelector(
-    (state: RootState) => state.listEnrollementsSlice
+    (state: RootState) => state.listEnrollementsSlice.loading
   );
 
   if (loading || enrollementsLoading) {
