@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function CheckoutPageSkeleton() {
   return (
     <div className="min-h-screen dark:bg-[#091025] bg-white py-10 px-6 md:px-20">
