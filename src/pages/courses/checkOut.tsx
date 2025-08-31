@@ -16,7 +16,7 @@ import {
 } from "../../store/slices/enrollments/createEnrollment";
 import toast from "react-hot-toast";
 import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import {
   createPaymentFn,
   resetCreatePaymentState,
