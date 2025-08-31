@@ -31,7 +31,7 @@ import ProtectedAdminRoute from "./admin/components/protectedAdmin/ProtectedAdmi
 import Logout from "./pages/logout";
 import MyCertificates from "./pages/myCertificates";
 import Reports from "./admin/pages/reports";
-import { CheckoutPage } from "./pages/courses/checkOut";
+import CheckoutPage from "./pages/courses/checkOut";
 export const mainRoter = createBrowserRouter([
   {
     path: "/",

@@ -57,7 +57,7 @@ const CourseDetailPage = () => {
     (state: RootState) => state.listEnrollementsSlice
   );
 
-  if (loading || enrollementsLoading.loading) {
+  if (loading || enrollementsLoading) {
     return <CourseDetailPageSkeleton />;
   }
 

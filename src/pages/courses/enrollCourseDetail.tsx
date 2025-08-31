@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../store/store";
 import type { Course } from "../../types/course";
 import { addToCart } from "../../store/slices/cart/cart";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 interface CourseCardProps {
   course: Course;

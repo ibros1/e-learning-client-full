@@ -1,6 +1,6 @@
 import type { Course } from "../../types/course";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 

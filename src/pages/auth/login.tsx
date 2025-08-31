@@ -7,7 +7,7 @@ import { type AppDispatch, type RootState } from "../../store/store";
 import { loginUserFn } from "../../store/slices/auth/login";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const Login = () => {
   const navigate = useNavigate();
