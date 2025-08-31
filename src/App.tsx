@@ -19,7 +19,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = document.documentElement;
     if (isDarkMode) {
       root.classList.add("dark");
       localStorage.setItem("dark", "true");
