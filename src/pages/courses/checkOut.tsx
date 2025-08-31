@@ -22,6 +22,7 @@ import {
   resetCreatePaymentState,
 } from "../../store/slices/payments/createPayment";
 import { clearCart } from "../../store/slices/cart/cart";
+import CheckoutPageSkeleton from "../../components/ui/chceckoutSkeleton";
 
 const paymentMethods = [
   {
@@ -159,6 +160,10 @@ export default function CheckoutPage() {
       dispatch(clearCart());
     }
   }, [createEnrollmentState, dispatch, formik, navigate]);
+
+  if (logInState.loading) {
+    return <CheckoutPageSkeleton />;
+  }
 
   if (!user)
     return (

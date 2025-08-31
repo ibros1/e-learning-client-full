@@ -30,7 +30,9 @@ const MyCourses: React.FC = () => {
   // useEffect(() => {
 
   // },[])
-
+  userState?.data?.user?.enrollements?.map((enrl) => {
+    console.log(enrl.courseId);
+  });
   useEffect(() => {
     if (userState.data?.user?.id) {
       dispatch(getCompletedLessonsFn(userState.data.user.id));
@@ -87,14 +89,9 @@ const MyCourses: React.FC = () => {
   }
 
   const enrolledCourses = userState.data?.user?.enrollements;
-  const myEnrolledCoursesState = userState?.data?.user?.enrollements;
-
-  const myEnrolledCourses = myEnrolledCoursesState
-    .map((enrl) =>
-      enrl.is_enrolled === true && enrl.status === "COMPLETED" ? 1 : 0
-    )
-    .reduce((accu: number, curr: number) => accu + curr, 0);
-  console.log(myEnrolledCourses);
+  const myEnrolledCourses = userState?.data?.user?.enrollements.map(
+    (enrl) => enrl.is_enrolled === true
+  );
 
   return (
     <main className="bg-gray-50 dark:bg-[#091025] min-h-screen">
@@ -115,8 +112,8 @@ const MyCourses: React.FC = () => {
               </Button>
             </div>
             <span className="text-xl font-semibold text-gray-600 dark:text-gray-300">
-              {myEnrolledCourses}{" "}
-              {myEnrolledCourses === 1 ? "Course" : "Courses"}
+              {myEnrolledCourses?.length}{" "}
+              {myEnrolledCourses?.length === 1 ? "Course" : "Courses"}
             </span>
           </div>
 

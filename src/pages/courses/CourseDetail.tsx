@@ -53,8 +53,11 @@ const CourseDetailPage = () => {
   useEffect(() => {
     if (courseId) dispatch(getOneCourseFn(+courseId));
   }, [dispatch, courseId]);
+  const enrollementsLoading = useSelector(
+    (state: RootState) => state.listEnrollementsSlice
+  );
 
-  if (loading) {
+  if (loading || enrollementsLoading.loading) {
     return <CourseDetailPageSkeleton />;
   }
 
