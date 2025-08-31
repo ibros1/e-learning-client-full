@@ -12,6 +12,7 @@ const App = () => {
   useEffect(() => {
     dispatch(WhoAmiFn());
   }, [dispatch]);
+
   useEffect(() => {
     const saved = localStorage.getItem("dark");
     if (saved === "true") setIsDarkMode(true);
@@ -28,11 +29,7 @@ const App = () => {
     }
   }, [isDarkMode]);
 
-  return (
-    <>
-      <RouterProvider router={mainRoter} />
-    </>
-  );
+  return <RouterProvider router={mainRoter} />;
 };
 
 export default App;
