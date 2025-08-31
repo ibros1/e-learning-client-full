@@ -17,7 +17,7 @@ import CoursesPage from "./pages/courses/AllCourses";
 import CourseDetailPage from "./pages/courses/CourseDetail";
 import ContinueCourse from "./pages/courses/continueCourse";
 import MyCourses from "./pages/courses/myCourses";
-import CheckoutPage from "./pages/courses/checkOut";
+
 import Enrollements from "./admin/pages/enrollements";
 import SuccessPayment from "./pages/successPayment/successPayment";
 import MyOrder from "./pages/order/MyOrder";
@@ -31,6 +31,7 @@ import ProtectedAdminRoute from "./admin/components/protectedAdmin/ProtectedAdmi
 import Logout from "./pages/logout";
 import MyCertificates from "./pages/myCertificates";
 import Reports from "./admin/pages/reports";
+import { CheckoutPage } from "./pages/courses/checkOut";
 export const mainRoter = createBrowserRouter([
   {
     path: "/",
