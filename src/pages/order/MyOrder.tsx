@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Filter,
@@ -8,10 +8,20 @@ import {
   RefreshCcw,
   Loader2,
 } from "lucide-react";
+
+import "jspdf-autotable";
+
 import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../store/store";
 import { listEnrollementsFn } from "../../store/slices/enrollments/listEnrollements";
 import MyOrderSkeleton from "../../components/ui/orderSkeleton";
+import { Button } from "../../components/ui/button";
+import { generateInvoicePDF } from "./pdfGenerator";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "../../components/ui/popover";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -53,6 +63,9 @@ const MyOrder = () => {
   );
   const loginState = useSelector((state: RootState) => state.loginSlice);
   const userId = loginState.data?.user?.id;
+
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   useEffect(() => {
     dispatch(listEnrollementsFn());
@@ -118,7 +131,39 @@ const MyOrder = () => {
                       })
                     : "—"}
                 </div>
-                <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400 cursor-pointer" />
+
+                <Popover
+                  open={popoverOpen && selectedOrder?.id === order.id}
+                  onOpenChange={setPopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <MoreVertical
+                      className="w-4 h-4 text-gray-500 dark:text-gray-400 cursor-pointer"
+                      onClick={() => setSelectedOrder(order)}
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-800 dark:text-gray-100">
+                        Invoice Options
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Download your order invoice as a PDF.
+                      </p>
+
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          generateInvoicePDF(order);
+                          setPopoverOpen(false);
+                        }}
+                      >
+                        Download PDF
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="flex items-center gap-3 mb-4">
