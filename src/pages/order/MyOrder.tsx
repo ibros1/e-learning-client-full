@@ -155,7 +155,13 @@ const MyOrder = () => {
                         size="sm"
                         className="w-full mt-2"
                         onClick={() => {
-                          generateInvoicePDF(order);
+                          generateInvoicePDF({
+                            ...order,
+                            created_at:
+                              typeof order.created_at === "string"
+                                ? order.created_at
+                                : order.created_at?.toISOString?.() ?? "",
+                          });
                           setPopoverOpen(false);
                         }}
                       >
