@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import type { iDeletedUserResponse } from "../../../../types/user";
 import { BASE_API_URL } from "../../../../constants/base_url";
 import { Default_Error_Message } from "../../../../constants/default_error";
+import type { RootState } from "../../../store";
 
 const initialState = {
   data: {} as iDeletedUserResponse,
@@ -12,10 +13,17 @@ const initialState = {
 
 export const deleteUserFn = createAsyncThunk(
   "/users/delete/:userId",
-  async (userId: number, { rejectWithValue }) => {
+  async (userId: number, { rejectWithValue, getState }) => {
     try {
+      const appState = getState() as RootState;
+      const token = appState.loginSlice.data?.token;
       const response = await axios.delete(
-        `${BASE_API_URL}/users/delete/${userId}`
+        `${BASE_API_URL}/users/delete/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       return response.data;
