@@ -1,9 +1,9 @@
-import { useDispatch } from "react-redux";
-
-import type { AppDispatch } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../store/store";
 import type { Course } from "../../types/course";
 import { addToCart } from "../../store/slices/cart/cart";
 import { Button } from "../../components/ui/button";
+import toast from "react-hot-toast";
 
 interface CourseCardProps {
   course: Course;
@@ -11,16 +11,27 @@ interface CourseCardProps {
 
 const EnrolleCourse: React.FC<CourseCardProps> = ({ course }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation(); // prevent parent click navigation
 
-    const cartItem = {
-      ...course,
-      quantity: 1,
-    };
+    // Check if course is already in cart
+    const exists = cartItems.find((item) => item.id === course.id);
+    if (exists) {
+      toast.error("Course is already in cart");
+      return;
+    }
 
-    dispatch(addToCart(cartItem));
+    // Add new course to cart
+    dispatch(
+      addToCart({
+        ...course,
+        quantity: 1,
+      })
+    );
+
+    toast.success("Course added to cart");
   };
 
   return (

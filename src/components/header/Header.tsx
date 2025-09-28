@@ -11,6 +11,7 @@ import Search from "../search";
 
 const Header = () => {
   const logInState = useSelector((state: RootState) => state.loginSlice);
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // ✅ React Router location object

@@ -3,6 +3,8 @@ import type { RootState } from "../store/store";
 
 const MyCertificates: React.FC = () => {
   const user = useSelector((state: RootState) => state.loginSlice.data?.user);
+
+
   if (!user)
     return <div className="">Please login first and enroll course</div>;
 

@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import EditEnrolls from "../components/enrolls/EditEnrolls";
-
 import DeleteEnrolls from "../components/enrolls/deleteEnrolls";
 import LessonsSkeleton from "../../components/ui/LessonsSkeleton";
 import {
@@ -26,8 +25,20 @@ import {
   TableRow,
 } from "../../components/ui/table";
 
+// ---------------- Types ----------------
 type StatusType = "ALL" | "COMPLETED" | "IN_PROGRESS" | "FAILED";
+type SortKey =
+  | "id"
+  | "full_name"
+  | "email"
+  | "phone"
+  | "course"
+  | "price"
+  | "progress"
+  | "status"
+  | "created_at";
 
+// ---------------- Filter Options ----------------
 const statusOptions: { label: string; value: StatusType }[] = [
   { label: "All", value: "ALL" },
   { label: "Completed", value: "COMPLETED" },
@@ -35,22 +46,38 @@ const statusOptions: { label: string; value: StatusType }[] = [
   { label: "Failed", value: "FAILED" },
 ];
 
+// ---------------- Main Component ----------------
 const Enrollments = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data } = useSelector(
+  const { data, loading } = useSelector(
     (state: RootState) => state.listEnrollementsSlice
   );
   const enrollments = data?.enrollemnets || [];
 
+  // Local State
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusType>("ALL");
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  // Fetch Enrollments
   useEffect(() => {
     dispatch(listEnrollementsFn());
   }, [dispatch]);
 
+  // Handle Sorting
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortOrder("asc");
+    }
+  };
+
+  // Filter + Search + Sort
   const filteredEnrollments = useMemo(() => {
-    return enrollments.filter((enr) => {
+    let list = enrollments.filter((enr) => {
       const matchesStatus =
         statusFilter === "ALL" ? true : enr.status === statusFilter;
 
@@ -61,8 +88,39 @@ const Enrollments = () => {
 
       return matchesStatus && matchesSearch;
     });
-  }, [enrollments, searchTerm, statusFilter]);
 
+    list.sort((a, b) => {
+      const valA =
+        sortKey === "full_name"
+          ? a.users!.full_name
+          : sortKey === "email"
+          ? a.users!.email
+          : sortKey === "phone"
+          ? a.users!.phone_number
+          : sortKey === "course"
+          ? a.course!.title
+          : (a as any)[sortKey];
+
+      const valB =
+        sortKey === "full_name"
+          ? b.users!.full_name
+          : sortKey === "email"
+          ? b.users!.email
+          : sortKey === "phone"
+          ? b.users!.phone_number
+          : sortKey === "course"
+          ? b.course!.title
+          : (b as any)[sortKey];
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return list;
+  }, [enrollments, searchTerm, statusFilter, sortKey, sortOrder]);
+
+  // Stats
   const stats = {
     total: enrollments.length,
     completed: enrollments.filter((e) => e.status === "COMPLETED").length,
@@ -86,41 +144,29 @@ const Enrollments = () => {
     {
       title: "Pending",
       value: stats.pending,
-      icon: <Loader2 className=" w-6 h-6 animate-spin " />,
+      icon: <Loader2 className="w-6 h-6 animate-spin" />,
       color: "yellow",
     },
-    {
-      title: "Failed",
-      value: stats.failed,
-      icon: <XCircle />,
-      color: "red",
-    },
+    { title: "Failed", value: stats.failed, icon: <XCircle />, color: "red" },
   ];
 
-  const enrollementsList = useSelector(
-    (state: RootState) => state.listEnrollementsSlice
-  );
-
-  if (enrollementsList.loading) {
-    return <LessonsSkeleton />;
-  }
+  // Loading State
+  if (loading) return <LessonsSkeleton />;
 
   return (
     <div className="p-6 dark:bg-[#091025] min-h-screen text-gray-900 dark:text-white">
       {/* Info Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {infoCards.map((card, index) => (
+        {infoCards.map((card, i) => (
           <div
-            key={index}
+            key={i}
             className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm rounded-2xl p-6 flex items-center gap-4 hover:shadow-lg transition-transform hover:scale-[1.02]"
           >
             <div
               className={`p-3 rounded-full bg-${card.color}-200 dark:bg-${card.color}-800`}
             >
               {React.cloneElement(card.icon, {
-                className: `text-2xl text-${card.color}-700 dark:text-${
-                  card.color
-                }-200 ${card.color === "yellow" ? "animate-spin" : ""}`,
+                className: `text-2xl text-${card.color}-700 dark:text-${card.color}-200`,
               })}
             </div>
             <div>
@@ -133,7 +179,7 @@ const Enrollments = () => {
         ))}
       </div>
 
-      {/* Search and Filter */}
+      {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
         <input
           type="text"
@@ -144,17 +190,17 @@ const Enrollments = () => {
         />
 
         <div className="flex gap-2 flex-wrap">
-          {statusOptions.map((option) => (
+          {statusOptions.map((opt) => (
             <button
-              key={option.value}
-              onClick={() => setStatusFilter(option.value)}
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-                statusFilter === option.value
+                statusFilter === opt.value
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              {option.label}
+              {opt.label}
             </button>
           ))}
         </div>
@@ -165,20 +211,31 @@ const Enrollments = () => {
         <Table className="min-w-[1200px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[60px]">#</TableHead>
-              <TableHead className="min-w-[220px]">Full Name</TableHead>
-              <TableHead className="min-w-[260px]">Email</TableHead>
-              <TableHead className="min-w-[140px]">Phone</TableHead>
-              <TableHead className="min-w-[220px]">Course Title</TableHead>
-              <TableHead className="min-w-[120px]">Course ID</TableHead>
-              <TableHead className="min-w-[120px]">Price</TableHead>
-              <TableHead className="min-w-[120px]">Progress</TableHead>
-              <TableHead className="min-w-[120px]">Enrolled</TableHead>
-              <TableHead className="min-w-[140px]">Status</TableHead>
-              <TableHead className="min-w-[160px]">Created</TableHead>
-              <TableHead className="min-w-[140px] text-center">
-                Actions
-              </TableHead>
+              {[
+                { key: "id", label: "#" },
+                { key: "full_name", label: "Full Name" },
+                { key: "email", label: "Email" },
+                { key: "phone", label: "Phone" },
+                { key: "course", label: "Course Title" },
+                { key: "courseId", label: "Course ID" },
+                { key: "price", label: "Price" },
+                { key: "progress", label: "Progress" },
+                { key: "is_enrolled", label: "Enrolled" },
+                { key: "status", label: "Status" },
+                { key: "created_at", label: "Created" },
+                { key: "actions", label: "Actions" },
+              ].map((col) => (
+                <TableHead
+                  key={col.key}
+                  className="cursor-pointer select-none"
+                  onClick={() =>
+                    col.key !== "actions" && handleSort(col.key as SortKey)
+                  }
+                >
+                  {col.label}
+                  {sortKey === col.key && (sortOrder === "asc" ? " ▲" : " ▼")}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
 
@@ -198,10 +255,8 @@ const Enrollments = () => {
                   key={enr.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  <TableCell className="text-muted-foreground">
-                    {enr.id}
-                  </TableCell>
-                  <TableCell className="truncate max-w-[200px]">
+                  <TableCell>{enr.id}</TableCell>
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <img
                         src={enr.users!.profilePhoto}
@@ -211,18 +266,14 @@ const Enrollments = () => {
                       <span className="truncate">{enr.users!.full_name}</span>
                     </div>
                   </TableCell>
-
                   <TableCell className="truncate max-w-[220px] text-blue-700 dark:text-blue-400">
                     <div className="flex gap-2 items-center">
-                      <Mail className="w-4 h-4 flex-shrink-0" />
+                      <Mail className="w-4 h-4" />
                       <span className="truncate">{enr.users!.email}</span>
                     </div>
                   </TableCell>
-
                   <TableCell>{enr.users!.phone_number}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    {enr.course!.title}
-                  </TableCell>
+                  <TableCell>{enr.course!.title}</TableCell>
                   <TableCell>{enr.course!.id}</TableCell>
                   <TableCell className="text-green-600 dark:text-green-400">
                     <BadgeDollarSign className="w-4 h-4 inline" /> $

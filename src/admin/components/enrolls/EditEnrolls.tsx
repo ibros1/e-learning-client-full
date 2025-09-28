@@ -10,6 +10,9 @@ import {
 } from "../../../components/ui/dialog";
 import { AlertDialogHeader } from "../../../components/ui/alert-dialog";
 import { Label } from "../../../components/ui/label";
+import { Switch } from "../../../components/ui/switch";
+import toast from "react-hot-toast";
+import { Pencil } from "lucide-react";
 
 import type { Enrollement } from "../../../types/enrollement";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,77 +21,48 @@ import {
   resetUpdateEnrollementState,
   updateEnrollementFn,
 } from "../../../store/slices/enrollments/updateEnrollement";
-import { Switch } from "../../../components/ui/switch";
-import toast from "react-hot-toast";
-import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnrollements";
 import { updatePaymentFn } from "../../../store/slices/payments/updatePayment";
-import { listPaymentsFn } from "../../../store/slices/payments/listPayments";
+import { listEnrollementsFn } from "../../../store/slices/enrollments/listEnrollements";
 import { WhoAmiFn } from "../../../store/slices/auth/user/getMe";
-import { Pencil } from "lucide-react";
 
 type EditEnrollProps = {
   enrollement: Enrollement;
 };
 
 const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
-  console.log(enrollement);
-  const logInState = useSelector((state: RootState) => state.loginSlice);
   const dispatch = useDispatch<AppDispatch>();
+  const logInState = useSelector((state: RootState) => state.loginSlice);
   const updateEnrollState = useSelector(
     (state: RootState) => state.updateEnrollementSlice
   );
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [status, setStatus] = useState(enrollement.status || "IN_PROGRESS");
-
   const [isEnrolled, setIsEnrolled] = useState(
     enrollement.is_enrolled ?? false
   );
 
+  // Toast handling for update status
   useEffect(() => {
-    dispatch(listPaymentsFn());
-  }, [dispatch]);
-  // const paymentState = useSelector(
-  //   (state: RootState) => state.listPaymentsSlice
-  // );
-
-  useEffect(() => {
-    if (
-      enrollement.status === "COMPLETED" &&
-      enrollement.is_enrolled === true
-    ) {
-      dispatch(
-        updatePaymentFn({
-          id: enrollement.paymentId,
-          isEnrolled: true,
-          status: "PAID",
-        })
-      );
-    }
-  }, [dispatch, enrollement]);
-
-  useEffect(() => {
-    if (updateEnrollState.error) {
-      toast.dismiss();
-      toast.error(updateEnrollState.error);
-      return;
-    }
     if (updateEnrollState.loading) {
       toast.dismiss();
       toast.loading("Updating...");
-      return;
-    }
-
-    if (updateEnrollState.data.isSuccess) {
+    } else if (updateEnrollState.error) {
       toast.dismiss();
-      toast.success("Successfully updated enrollement");
+      toast.error(updateEnrollState.error);
+    } else if (updateEnrollState.data.isSuccess) {
+      toast.dismiss();
+      toast.success("Successfully updated enrollment");
       dispatch(WhoAmiFn());
       dispatch(listEnrollementsFn());
       dispatch(resetUpdateEnrollementState());
     }
-  }, [updateEnrollState.data.isSuccess, updateEnrollState.error, dispatch]);
+  }, [updateEnrollState, dispatch]);
 
+  // Submit handler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     dispatch(
       updateEnrollementFn({
         id: enrollement.id,
@@ -98,6 +72,18 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
         isEnrolled,
       })
     );
+
+    // Only update payment if enrollment is completed and enrolled
+    if (status === "COMPLETED" && isEnrolled) {
+      dispatch(
+        updatePaymentFn({
+          id: enrollement.paymentId,
+          isEnrolled: true,
+          status: "PAID",
+        })
+      );
+    }
+
     setIsEditDialogOpen(false);
   };
 
@@ -116,13 +102,14 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
         <DialogContent>
           <form onSubmit={handleSubmit} className="sm:max-w-[425px]">
             <AlertDialogHeader>
-              <DialogTitle>Edit Enrollement</DialogTitle>
+              <DialogTitle>Edit Enrollment</DialogTitle>
               <DialogDescription>
-                You can edit the selected chapter below.
+                You can edit the selected enrollment below.
               </DialogDescription>
             </AlertDialogHeader>
 
-            <div className="flex items-center gap-3">
+            {/* Enroll Immediately */}
+            <div className="flex items-center gap-3 my-4">
               <Switch
                 id="isEnrolled"
                 checked={isEnrolled}
@@ -131,7 +118,8 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
               <Label htmlFor="isEnrolled">Enroll Immediately</Label>
             </div>
 
-            <div className="grid gap-3 ">
+            {/* Status Select */}
+            <div className="grid gap-3 my-4">
               <Label htmlFor="status">Select status</Label>
               <select
                 id="status"
@@ -145,6 +133,7 @@ const EditEnrolls = ({ enrollement }: EditEnrollProps) => {
               </select>
             </div>
 
+            {/* Dialog Footer */}
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline" type="button">
