@@ -9,7 +9,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronUp,
   ChevronDown,
@@ -29,13 +29,24 @@ import clsx from "clsx";
 import type { Payment } from "../../types/payment";
 import { motion } from "framer-motion";
 import { PaymentsSkeleton } from "../../components/ui/paymentsSkeleton";
+import { Avatar } from "../../components/ui/avatar";
 
 export const Payments = () => {
   const dispatch = useDispatch<AppDispatch>();
   const paymentsState = useSelector(
     (state: RootState) => state.listPaymentsSlice
   );
-  const payments = paymentsState.data?.payments ?? [];
+
+  const payments = useMemo(() => {
+    return (
+      paymentsState.data?.payments
+        ?.slice()
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ) ?? []
+    );
+  }, [paymentsState.data]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -68,7 +79,7 @@ export const Payments = () => {
       value: "$32,890",
       change: "-1.7%",
       isPositive: false,
-      icon: <Calendar className="w-6 h-6" />,
+      icon: <Calendar className="w-6 h-6 " />,
       color: "bg-amber-100 dark:bg-amber-900/50",
       textColor: "text-amber-600 dark:text-amber-300",
     },
@@ -98,11 +109,14 @@ export const Payments = () => {
         const user = row.original.user;
         return (
           <div className="flex items-center gap-3">
-            <img
-              src={`${user.profilePhoto ?? ""}`}
-              alt={user.full_name}
-              className="w-10 h-10 rounded-full object-cover border border-gray-300"
-            />
+            <Avatar>
+              <img
+                src={`${user.profilePhoto ?? ""}`}
+                alt={user.full_name}
+                className="w-10 h-10 rounded-full object-cover border
+              border-gray-300"
+              />
+            </Avatar>
             <div>
               <p className="font-medium">{user.full_name}</p>
               <p className="text-xs text-gray-500">{user.email}</p>
